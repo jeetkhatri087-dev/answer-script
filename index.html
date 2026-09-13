@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studyio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<style>
+  /* ---- theme: chalkboard (default light, auto-dark) ---- */
+  html[data-theme="chalkboard"]{
+    --font-display:"Newsreader",Georgia,serif; --font-body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --bg:#f5f1e4; --bg-line:#ded2b1;
+    --ink:#223349; --ink-soft:#51637a;
+    --accent:#1f4235; --accent-deep:#153123; --accent-text:#eef1ea;
+    --mark:#ab301c; --mark-soft:#c96654; --mark-wash:#f5e2dd;
+    --gold:#8a611a; --gold-wash:#f1e6cb;
+    --surface:#fffdf6; --surface-2:#fbf6e8;
+    --border:#dcd0a9; --shadow:rgba(34,51,73,0.10);
+    --focus:#3b6ea5; --ok:#2f6b3a; --ok-wash:#e3ecdf;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    html[data-theme="chalkboard"]{
+      --bg:#152019; --bg-line:#233427;
+      --ink:#eae4d2; --ink-soft:#b7c0b2;
+      --accent:#0e1e16; --accent-deep:#0a1610; --accent-text:#eae4d2;
+      --mark:#e07a5f; --mark-soft:#b8503b; --mark-wash:#3a2420;
+      --gold:#d8b25e; --gold-wash:#3a3120;
+      --surface:#1b2a21; --surface-2:#17231c;
+      --border:#2c4032; --shadow:rgba(0,0,0,0.4);
+      --focus:#7fa8d9; --ok:#8fbf8f; --ok-wash:#203122;
+      color-scheme: dark;
+    }
+  }
+  /* ---- theme: enchanted academy (original candlelit/parchment look, default) ---- */
+  html[data-theme="enchanted"]{
+    --font-display:"Cinzel",Georgia,serif; --font-body:"EB Garamond",Georgia,serif;
+    --bg:#221a12; --bg-line:#2f2417;
+    --ink:#ecdfc0; --ink-soft:#c3b083;
+    --accent:#4a1620; --accent-deep:#330e16; --accent-text:#f1e2bd;
+    --mark:#c9a227; --mark-soft:#8f7220; --mark-wash:#3a2f18;
+    --gold:#c9a227; --gold-wash:#3a2f18;
+    --surface:#2b2116; --surface-2:#241b11;
+    --border:#4a3c26; --shadow:rgba(0,0,0,0.5);
+    --focus:#7fa8d9; --ok:#7fae6f; --ok-wash:#22301c;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:var(--font-body); font-size:15px; line-height:1.55;
+  }
+  h1,h2,h3{ font-family:var(--font-display); text-wrap:balance; margin:0; color:var(--ink); }
+  html[data-theme="enchanted"] h1, html[data-theme="enchanted"] h2, html[data-theme="enchanted"] h3{ letter-spacing:.02em; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+  a{ color:var(--focus) }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+
+  .app{ display:flex; min-height:100vh; }
+  .nav{
+    width:216px; flex-shrink:0; background:var(--accent); color:var(--accent-text);
+    display:flex; flex-direction:column; gap:2px; padding:20px 12px; position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .brand{ padding:4px 10px 18px; }
+  .brand .eyebrow{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.65; }
+  .brand h1{ font-size:20px; color:var(--accent-text); font-weight:600; margin-top:2px; }
+  .navbtn{
+    display:flex; align-items:center; gap:10px; text-align:left; width:100%;
+    background:transparent; border:none; color:var(--accent-text); opacity:.78;
+    padding:10px 12px; border-radius:8px; font-size:14px; cursor:pointer;
+  }
+  .navbtn .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.5; flex-shrink:0; }
+  .navbtn:hover{ background:rgba(238,241,234,0.08); opacity:1; }
+  .navbtn.active{ background:rgba(238,241,234,0.14); opacity:1; font-weight:600; }
+  .navbtn.disabled{ opacity:.4; }
+  .nav-footer{ margin-top:auto; padding:12px 12px 4px; font-size:11.5px; opacity:.55; line-height:1.5; }
+
+  main{ flex:1; min-width:0; padding:28px clamp(16px,4vw,44px) 60px; }
+  .page-head{ margin-bottom:22px; }
+  .page-head .eyebrow{ font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); font-weight:600; }
+  .page-head h2{ font-size:26px; margin-top:4px; }
+  .page-head p{ color:var(--ink-soft); margin-top:6px; max-width:62ch; font-size:14px; }
+  .section-h{ font-size:17px; margin-bottom:12px; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:16px; box-shadow:0 1px 2px var(--shadow); cursor:pointer; text-align:left;
+    display:flex; flex-direction:column; gap:8px; width:100%; color:var(--ink);
+  }
+  .card:hover{ border-color:var(--focus); }
+  .card h3{ font-size:16.5px; font-weight:600; }
+  .card .meta{ display:flex; gap:14px; font-size:12.5px; color:var(--ink-soft); flex-wrap:wrap; }
+  .card .meta b{ color:var(--ink); font-family:"IBM Plex Mono",monospace; }
+  .pill{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; padding:3px 9px;
+    border-radius:999px; background:var(--gold-wash); color:var(--gold); font-weight:600; width:fit-content;
+  }
+
+  label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; letter-spacing:.02em; }
+  select, input[type=text], input[type=number], input[type=password], textarea{
+    width:100%; background:var(--surface); color:var(--ink); border:1px solid var(--border);
+    border-radius:8px; padding:9px 11px; font-family:var(--font-body); font-size:14px;
+  }
+  textarea{ resize:vertical; min-height:90px; font-family:var(--font-body); }
+  .field{ margin-bottom:16px; }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .row > .field{ flex:1; min-width:150px; }
+
+  .btn{
+    background:var(--accent); color:var(--accent-text); border:none; border-radius:8px;
+    padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover{ background:var(--accent-deep); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn.secondary{ background:transparent; color:var(--ink); border:1px solid var(--border); }
+  .btn.secondary:hover{ border-color:var(--focus); }
+  .btn.danger{ background:transparent; color:var(--mark); border:1px solid var(--mark-soft); }
+  .btn.small{ padding:6px 12px; font-size:12.5px; }
+  .linkbtn{ background:none; border:none; color:var(--focus); cursor:pointer; font-size:13px; padding:0; text-decoration:underline; }
+
+  .panel{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; }
+
+  .chapters-box{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .chapter-chip{ display:flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:6px 12px; font-size:13px; cursor:pointer; user-select:none; }
+  .chapter-chip input{ accent-color:var(--accent); margin:0; }
+  .chapter-chip.checked{ border-color:var(--gold); background:var(--gold-wash); }
+  .chaptools{ display:flex; gap:12px; margin-top:6px; margin-bottom:14px; }
+
+  .diff-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .diff-opt{ flex:1; min-width:120px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; cursor:pointer; font-size:12.5px; text-align:center; background:var(--surface-2); }
+  .diff-opt.checked{ border-color:var(--gold); background:var(--gold-wash); color:var(--gold); font-weight:600; }
+  .diff-opt input{ display:none; }
+
+  .paper-sheet{
+    background: linear-gradient(var(--bg-line) 1px, transparent 1px);
+    background-size: 100% 28px; background-color:var(--surface-2);
+    border:1px solid var(--border); border-radius:10px; padding:22px 20px 26px; margin-top:16px;
+  }
+  .paper-sheet .head{ border:1.5px solid var(--ink); border-radius:6px; padding:12px 14px; margin-bottom:16px; background:var(--surface); }
+  .paper-sheet .head .subj{ font-family:var(--font-display); font-size:19px; font-weight:600; }
+  .paper-sheet .head .meta{ display:flex; gap:18px; font-size:12.5px; color:var(--ink-soft); margin-top:6px; font-family:"IBM Plex Mono",monospace; flex-wrap:wrap; }
+  .paper-sheet pre{ white-space:pre-wrap; font-family:var(--font-display); font-size:15.5px; line-height:1.85; margin:0; color:var(--ink); }
+  .thinking{ color:var(--ink-soft); font-style:italic; }
+
+  .qrow{ display:flex; gap:14px; align-items:flex-start; padding:12px 0; border-bottom:1px dashed var(--border); }
+  .qrow:last-child{ border-bottom:none; }
+  .circle-mark{
+    flex-shrink:0; width:44px; height:44px; border-radius:50%; border:2px solid var(--mark);
+    color:var(--mark); display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:12.5px; transform:rotate(-4deg); text-align:center;
+  }
+  .qrow .qbody{ flex:1; min-width:0; }
+  .qrow .qno{ font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-soft); margin-bottom:2px; }
+  .qrow .pointer{ font-size:14px; }
+  .score-banner{
+    display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+    background:var(--mark-wash); border:1px solid var(--mark-soft); border-radius:10px;
+    padding:14px 18px; margin-bottom:18px; flex-wrap:wrap;
+  }
+  .score-banner .num{ font-family:"IBM Plex Mono",monospace; font-size:28px; color:var(--mark); font-weight:600; }
+  .advice-list{ margin:0; padding-left:18px; font-size:14px; }
+  .advice-list li{ margin-bottom:6px; }
+
+  .uploadbox{ border:1.5px dashed var(--border); border-radius:10px; padding:16px; text-align:center; font-size:13px; color:var(--ink-soft); cursor:pointer; }
+  .uploadbox:hover{ border-color:var(--focus); }
+
+  .notice{ background:var(--gold-wash); color:var(--gold); border:1px solid var(--gold); border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+  .notice.err{ background:var(--mark-wash); color:var(--mark); border-color:var(--mark-soft); }
+  .notice.ok{ background:var(--ok-wash); color:var(--ok); border-color:var(--ok); }
+
+  .material-item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+  .material-item:last-child{ border-bottom:none; }
+  .thumb{ width:52px; height:52px; border-radius:8px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--surface-2); }
+  .thumb.icon{ display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--ink-soft); font-family:"IBM Plex Mono",monospace; text-transform:uppercase; }
+  .material-item .mbody{ flex:1; min-width:0; }
+  .material-item .row1{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .material-item .fname{ font-weight:600; font-size:13.5px; }
+  .status-badge{ font-size:11px; padding:2px 8px; border-radius:999px; font-weight:600; flex-shrink:0; }
+  .status-badge.pending{ background:var(--gold-wash); color:var(--gold); }
+  .status-badge.done{ background:var(--ok-wash); color:var(--ok); }
+  .status-badge.failed{ background:var(--mark-wash); color:var(--mark); }
+  .material-item .excerpt{ font-size:12.5px; color:var(--ink-soft); margin-top:6px; white-space:pre-wrap; }
+  .material-item .rowbtns{ display:flex; gap:10px; margin-top:6px; }
+
+  .empty{ color:var(--ink-soft); font-size:14px; padding:20px 0; }
+  .backlink{ background:none; border:none; color:var(--focus); cursor:pointer; font-size:13px; margin-bottom:14px; padding:0; text-decoration:underline; }
+
+  @media (max-width:760px){
+    .app{ flex-direction:column; }
+    .nav{ width:100%; flex-direction:row; align-items:center; overflow-x:auto; padding:12px; gap:6px; position:static; height:auto; }
+    .brand{ padding:0 10px 0 0; flex-shrink:0; }
+    .brand h1{ font-size:16px; }
+    .navbtn{ width:auto; white-space:nowrap; }
+    .nav-footer{ display:none; }
+    main{ padding:20px 16px 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="nav">
+    <div class="brand">
+      <div class="eyebrow">ICSE &middot; Class 9</div>
+      <h1>Studyio</h1>
+    </div>
+    <button class="navbtn" data-tab="papers"><span class="dot"></span>Papers</button>
+    <button class="navbtn" data-tab="material"><span class="dot"></span>Material</button>
+    <button class="navbtn" data-tab="analysis"><span class="dot"></span>Analysis</button>
+    <button class="navbtn" data-tab="planner"><span class="dot"></span>Planner</button>
+    <button class="navbtn" data-tab="settings"><span class="dot"></span>Settings</button>
+    <div class="nav-footer">Runs in this browser on your own free Gemini key. Nothing leaves your device except straight to Google when you ask it something.</div>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DEFAULT_SUBJECTS = [
+    ["mathematics","Mathematics"],["physics","Physics"],["chemistry","Chemistry"],
+    ["biology","Biology"],["english-language","English Language"],["english-literature","English Literature"],
+    ["history-civics","History & Civics"],["geography","Geography"],["hindi","Hindi"]
+  ];
+  var CHAPTER_SEED = {
+    "mathematics": ["Rational & Irrational Numbers","Compound Interest","Expansions","Factorisation","Simultaneous Equations","Indices","Logarithms","Triangles & Congruency","Pythagoras Theorem","Rectilinear Figures","Circle","Statistics & Mean/Median","Mensuration (Area/Volume)","Trigonometrical Ratios","Coordinate Geometry"],
+    "physics": ["Measurements & Experimentation","Motion in One Dimension","Laws of Motion","Fluids","Heat & Energy","Reflection of Light","Sound","Current Electricity","Magnetism"],
+    "chemistry": ["Language of Chemistry","Chemical Changes & Reactions","Water","Atomic Structure & Bonding","The Periodic Table","Study of Hydrogen","Gas Laws","Atmospheric Pollution"],
+    "biology": ["Cell Structure","Flora & Fauna of India","Diversity of Organisms","Bacteria & Fungi","Plant Nutrition & Reproduction","Transpiration","Photosynthesis","Skeletal & Muscular System","Digestive System","Circulatory System","Respiratory System"],
+    "english-language": ["Composition / Essay Writing","Formal & Informal Letters","Comprehension","Grammar","Précis Writing"],
+    "english-literature": ["Prescribed Poems","Prescribed Short Stories","Prescribed Play","Prescribed Novel"],
+    "history-civics": ["The French Revolution","Age of Napoleon","Industrial Revolution","First War of Independence 1857","The Indian Constitution","Union Legislature"],
+    "geography": ["Location & Extent of India","Structure & Physiography","Drainage","Climate","Natural Vegetation","Soils"],
+    "hindi": ["Gadya (Prose)","Padya (Poetry)","Vyakaran (Grammar)","Rachna (Composition)"]
+  };
+  var DIFFICULTIES = [
+    [1,"1 · Easy","direct recall, straightforward"],
+    [2,"2 · Below Average","simple, single-step application"],
+    [3,"3 · Average","a typical school class test"],
+    [4,"4 · Above Average","multi-step, tricky application"],
+    [5,"5 · Very Hard","board-level, twisted HOTS questions"]
+  ];
+  var MODELS = [
+    ["gemini-2.5-flash","Gemini 2.5 Flash — recommended (free tier)"],
+    ["gemini-2.5-flash-lite","Gemini 2.5 Flash-Lite — fastest & lightest"],
+    ["gemini-2.5-pro","Gemini 2.5 Pro — smartest, slower, smaller free quota"],
+    ["custom","Custom model ID…"]
+  ];
+  var THEMES = [["enchanted","Enchanted Academy (default)"],["chalkboard","Chalkboard & Chalk"]];
+  var STORAGE_KEY = "answerScriptData_v2";
+  var SYNC_CODE_KEY = "answerScriptSyncCode_v1";
+
+  // ---------- optional cross-device cloud sync ----------
+  var FIREBASE_CONFIG = null; // paste your Firebase web config here — see SETUP.md
+  var fbDb = null, syncDocRef = null, syncUnsub = null, cloudPushTimer = null;
+  var syncStatus = FIREBASE_CONFIG ? "connecting" : "disabled";
+  var pendingRerender = false, applyingRemote = false;
+
+  function getSyncCode(){ try{ return localStorage.getItem(SYNC_CODE_KEY) || ""; }catch(e){ return ""; } }
+  function setSyncCodeLocal(code){ try{ localStorage.setItem(SYNC_CODE_KEY, code); }catch(e){} }
+  async function initSync(){
+    if(!FIREBASE_CONFIG){ syncStatus = "disabled"; return; }
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      fbDb = firebase.firestore();
+      await firebase.auth().signInAnonymously();
+      var code = getSyncCode();
+      if(code) connectSync(code); else syncStatus = "no-code";
+    }catch(e){ console.warn("sync init failed", e); syncStatus = "error"; }
+    if(tab==="settings") render();
+  }
+  function connectSync(code){
+    if(!fbDb || !code) return;
+    if(syncUnsub){ syncUnsub(); syncUnsub = null; }
+    syncStatus = "connecting"; setSyncCodeLocal(code);
+    syncDocRef = fbDb.collection("syncs").doc(code);
+    syncUnsub = syncDocRef.onSnapshot(function(snap){
+      syncStatus = "connected";
+      if(snap.exists){
+        var remote = snap.data();
+        if(remote && remote.payload){
+          var currentStr = JSON.stringify(state);
+          if(remote.payload !== currentStr){
+            applyingRemote = true;
+            try{ state = JSON.parse(remote.payload); localStorage.setItem(STORAGE_KEY, remote.payload); }catch(e){}
+            applyingRemote = false;
+            var activeTag = document.activeElement && document.activeElement.tagName;
+            if(activeTag==="INPUT" || activeTag==="TEXTAREA" || activeTag==="SELECT") pendingRerender = true;
+            else render();
+          }
+        }
+      }else{ pushToCloud(true); }
+    }, function(err){ console.warn("sync error", err); syncStatus = "error"; if(tab==="settings") render(); });
+  }
+  function pushToCloud(immediate){
+    if(!syncDocRef || applyingRemote) return;
+    if(cloudPushTimer) clearTimeout(cloudPushTimer);
+    var doPush = function(){
+      syncDocRef.set({ payload: JSON.stringify(state), updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+        .catch(function(e){ console.warn("cloud push failed", e); });
+    };
+    if(immediate) doPush(); else cloudPushTimer = setTimeout(doPush, 800);
+  }
+
+  var state = null;
+  var tab = "papers";
+  var materialOpenSubject = null;
+
+  // ---------- persistence ----------
+  function loadState(){
+    var raw = null; try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){}
+    var s = raw ? JSON.parse(raw) : null;
+    if(!s){
+      s = { apiKey:"", model:"gemini-2.5-flash", customModel:"", theme:"enchanted",
+        subjects:{}, materials:[], papers:[], results:[] };
+      DEFAULT_SUBJECTS.forEach(function(p){
+        s.subjects[p[0]] = { slug:p[0], name:p[1], chapters:(CHAPTER_SEED[p[0]]||[]).slice() };
+      });
+    }
+    if(!s.subjects) s.subjects = {};
+    if(!s.materials) s.materials = [];
+    if(!s.papers) s.papers = [];
+    if(!s.results) s.results = [];
+    if(!s.model) s.model = "gemini-2.5-flash";
+    if(!s.theme) s.theme = "enchanted";
+    Object.keys(s.subjects).forEach(function(k){ if(!s.subjects[k].chapters) s.subjects[k].chapters = []; });
+    return s;
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ alert("Couldn't save to this browser's storage. Your device may be low on space or in private-browsing mode."); }
+    if(!applyingRemote) pushToCloud(false);
+  }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+  // ---------- helpers ----------
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function slugify(s){ return String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"") || ("subject-"+uid()); }
+  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short"}); }catch(e){ return ""; } }
+  function el(html){ var t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+  function sortedSubjects(){ return Object.keys(state.subjects).map(function(k){return state.subjects[k];}).sort(function(a,b){return a.name.localeCompare(b.name);}); }
+  function subjectName(slug){ return state.subjects[slug] ? state.subjects[slug].name : slug; }
+  function activeModel(){ return state.model==="custom" ? (state.customModel||"gemini-2.5-flash") : state.model; }
+  function fileToBase64(file){
+    return new Promise(function(resolve,reject){
+      var r = new FileReader();
+      r.onload = function(){ resolve(String(r.result).split(",")[1]); };
+      r.onerror = reject; r.readAsDataURL(file);
+    });
+  }
+  function makeThumbnail(file){
+    return new Promise(function(resolve){
+      if(!file.type || file.type.indexOf("image/")!==0){ resolve(null); return; }
+      var img = new Image(); var url = URL.createObjectURL(file);
+      img.onload = function(){
+        var maxW=220, scale=Math.min(1,maxW/img.width);
+        var w=Math.max(1,Math.round(img.width*scale)), h=Math.max(1,Math.round(img.height*scale));
+        var c=document.createElement("canvas"); c.width=w; c.height=h;
+        c.getContext("2d").drawImage(img,0,0,w,h);
+        var dataUrl = c.toDataURL("image/jpeg",0.6);
+        URL.revokeObjectURL(url); resolve(dataUrl);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
+  // ---------- Gemini API ----------
+  async function callGemini(parts, opts){
+    opts = opts || {};
+    if(!state.apiKey){ throw {code:"no_key", message:"no key"}; }
+    var model = opts.model || activeModel();
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(state.apiKey);
+    var genConfig = {};
+    if(opts.maxOutputTokens) genConfig.maxOutputTokens = opts.maxOutputTokens;
+    if(opts.json) genConfig.responseMimeType = "application/json";
+    var body = { contents:[{ role:"user", parts: parts }], generationConfig: genConfig };
+    var resp;
+    try{ resp = await fetch(url, { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(body) }); }
+    catch(e){ throw {code:"network", message:String(e && e.message || e)}; }
+    var json = await resp.json().catch(function(){ return null; });
+    if(!resp.ok){
+      var msg = (json && json.error && json.error.message) || ("HTTP "+resp.status);
+      var code = (json && json.error && json.error.status) || ("http_"+resp.status);
+      throw {code:code, message:msg};
+    }
+    var cand = json && json.candidates && json.candidates[0];
+    if(!cand){ throw {code:"empty", message:"No response — the request may have been blocked."}; }
+    if(cand.finishReason==="SAFETY" || cand.finishReason==="RECITATION"){
+      throw {code:"refused", message:"Gemini declined this request (reason: "+cand.finishReason+")."};
+    }
+    var text = ((cand.content && cand.content.parts) || []).map(function(p){ return p.text||""; }).join("");
+    if(!text){ throw {code:"empty", message:"Empty response. Try again with less at once."}; }
+    return text;
+  }
+  function extractJson(text){
+    try{ return JSON.parse(text); }catch(e){}
+    var a=text.indexOf("{"), b=text.lastIndexOf("}");
+    if(a>=0 && b>a){ try{ return JSON.parse(text.slice(a,b+1)); }catch(e){} }
+    throw new Error("Couldn't read the reply as structured data.");
+  }
+  function apiErrorCopy(e){
+    if(!e) return "Something went wrong. Try again.";
+    if(e.code==="no_key") return "Add your free Gemini API key in Settings first.";
+    if(e.code==="network") return "Couldn't reach Google's servers — check your internet connection.";
+    if(e.code==="UNAUTHENTICATED" || e.code==="PERMISSION_DENIED" || e.code==="http_401" || e.code==="http_403") return "That API key was rejected. Double-check it in Settings.";
+    if(e.code==="RESOURCE_EXHAUSTED" || e.code==="http_429") return "You've hit the free tier's rate limit for now — wait a bit and try again.";
+    if(e.code==="refused") return e.message;
+    if(e.code==="empty") return e.message || "No answer came back. Try again.";
+    return "Something went wrong (" + (e.message||"unknown") + "). Try again.";
+  }
+
+  // ---------- shell ----------
+  function render(){
+    document.documentElement.setAttribute("data-theme", state.theme);
+    document.querySelectorAll(".navbtn").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")===tab); });
+    var main = document.getElementById("main");
+    main.innerHTML = "";
+    if(!state.apiKey && tab!=="settings"){
+      main.appendChild(el('<div class="notice">Add your free Gemini API key in <b>Settings</b> before generating or checking papers. Everything else works without it.</div>'));
+    }
+    if(tab==="papers") renderPapers(main);
+    else if(tab==="material") renderMaterial(main);
+    else if(tab==="analysis") renderAnalysis(main);
+    else if(tab==="planner") renderPlanner(main);
+    else if(tab==="settings") renderSettings(main);
+  }
+  document.querySelectorAll(".navbtn").forEach(function(b){
+    b.addEventListener("click", function(){ tab = b.getAttribute("data-tab"); render(); });
+  });
+
+  // ================= PAPERS =================
+  function renderPapers(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Papers</div><h2>Create a paper</h2>'+
+      '<p>Matches your school’s format using everything you’ve uploaded in Material, and skips whatever you mark as omitted.</p></div>'
+    ));
+    var panel = el('<div class="panel"></div>');
+    var subj0 = sortedSubjects()[0] ? sortedSubjects()[0].slug : "";
+    panel.innerHTML =
+      '<div class="field"><label for="p-subject">Subject</label><select id="p-subject">'+
+        sortedSubjects().map(function(s){ return '<option value="'+esc(s.slug)+'">'+esc(s.name)+'</option>'; }).join("")+
+      '</select></div>'+
+      '<div class="field"><label>Chapters (pick at least one)</label>'+
+      '<div class="chaptools"><button type="button" class="linkbtn" id="p-chap-all">Select all</button><button type="button" class="linkbtn" id="p-chap-none">Clear</button></div>'+
+      '<div class="chapters-box" id="p-chapters"></div></div>'+
+      '<div class="row">'+
+        '<div class="field"><label for="p-marks">Marks (enter manually)</label><input id="p-marks" type="number" value="40" min="5" step="5"></div>'+
+        '<div class="field"><label for="p-time">Time (minutes)</label><input id="p-time" type="number" value="60" min="15" step="5"></div>'+
+      '</div>'+
+      '<div class="field"><label>Difficulty</label><div class="diff-row" id="p-difficulty"></div></div>'+
+      '<div class="field"><label for="p-omit">Extra points / omissions</label>'+
+      '<textarea id="p-omit" placeholder="e.g. Omit the last two headings of Chapter 4. Focus extra on Trigonometry."></textarea>'+
+      '<div class="uploadbox" id="p-omit-uploadbox" style="margin-top:8px;">Or upload your teacher’s omission list / textbook page (photo, PDF, Word, txt) — it’ll be read and added above</div>'+
+      '<input type="file" id="p-omit-file" accept="*/*" style="display:none">'+
+      '<div id="p-omit-status"></div></div>'+
+      '<button class="btn" id="gen-btn">Generate practice paper</button>'+
+      '<div id="gen-status"></div><div id="gen-output"></div>';
+    main.appendChild(panel);
+
+    function renderChapterChips(){
+      var slug = document.getElementById("p-subject").value;
+      var chapters = (state.subjects[slug] && state.subjects[slug].chapters) || [];
+      var box = document.getElementById("p-chapters");
+      if(chapters.length===0){
+        box.innerHTML = '<span style="font-size:13px;color:var(--ink-soft)">No chapters listed yet for this subject — add some in Material.</span>';
+        return;
+      }
+      box.innerHTML = chapters.map(function(c,i){
+        return '<label class="chapter-chip checked" data-idx="'+i+'"><input type="checkbox" checked value="'+esc(c)+'"><span>'+esc(c)+'</span></label>';
+      }).join("");
+      box.querySelectorAll(".chapter-chip").forEach(function(chip){
+        chip.addEventListener("click", function(){
+          setTimeout(function(){ chip.classList.toggle("checked", chip.querySelector("input").checked); }, 0);
+        });
+      });
+    }
+    document.getElementById("p-subject").addEventListener("change", renderChapterChips);
+    renderChapterChips();
+    document.getElementById("p-chap-all").addEventListener("click", function(){
+      document.querySelectorAll("#p-chapters input").forEach(function(cb){ cb.checked=true; cb.closest(".chapter-chip").classList.add("checked"); });
+    });
+    document.getElementById("p-chap-none").addEventListener("click", function(){
+      document.querySelectorAll("#p-chapters input").forEach(function(cb){ cb.checked=false; cb.closest(".chapter-chip").classList.remove("checked"); });
+    });
+
+    var diffBox = document.getElementById("p-difficulty");
+    diffBox.innerHTML = DIFFICULTIES.map(function(d,i){
+      return '<label class="diff-opt'+(i===2?" checked":"")+'"><input type="radio" name="p-diff" value="'+d[0]+'"'+(i===2?" checked":"")+'>'+esc(d[1])+'<br><span style="font-weight:400;font-size:11px;">'+esc(d[2])+'</span></label>';
+    }).join("");
+    diffBox.querySelectorAll(".diff-opt").forEach(function(opt){
+      opt.addEventListener("click", function(){
+        diffBox.querySelectorAll(".diff-opt").forEach(function(o){ o.classList.remove("checked"); });
+        opt.classList.add("checked");
+      });
+    });
+
+    document.getElementById("p-omit-uploadbox").addEventListener("click", function(){ document.getElementById("p-omit-file").click(); });
+    document.getElementById("p-omit-file").addEventListener("change", async function(){
+      var file = this.files[0]; if(!file) return;
+      var status = document.getElementById("p-omit-status");
+      status.innerHTML = ""; status.appendChild(el('<div class="empty thinking" style="padding:6px 0;">Reading '+esc(file.name)+'&hellip;</div>'));
+      var sName = subjectName(document.getElementById("p-subject").value);
+      try{
+        var extracted = await analyzeOmissionFile(file, sName);
+        var ta = document.getElementById("p-omit");
+        ta.value = (ta.value ? ta.value + "\n\n" : "") + "[From "+file.name+"]\n" + extracted;
+        status.innerHTML = "";
+        status.appendChild(el('<div class="notice ok">Read and added below — edit if needed.</div>'));
+      }catch(e){
+        status.innerHTML = "";
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }
+    });
+
+    document.getElementById("gen-btn").addEventListener("click", async function(){
+      var btn = this;
+      var subjectSlug = document.getElementById("p-subject").value;
+      var sName = subjectName(subjectSlug);
+      var chapters = Array.from(document.querySelectorAll("#p-chapters input:checked")).map(function(cb){ return cb.value; });
+      var marksTotal = parseInt(document.getElementById("p-marks").value,10) || 40;
+      var timeMinutes = parseInt(document.getElementById("p-time").value,10) || 60;
+      var diffRadio = diffBox.querySelector("input:checked");
+      var diffNum = diffRadio ? diffRadio.value : "3";
+      var diffInfo = DIFFICULTIES.find(function(d){ return String(d[0])===String(diffNum); }) || DIFFICULTIES[2];
+      var omit = document.getElementById("p-omit").value.trim();
+      var status = document.getElementById("gen-status"), out = document.getElementById("gen-output");
+      status.innerHTML=""; out.innerHTML="";
+      if(chapters.length===0){ status.appendChild(el('<div class="notice err">Select at least one chapter.</div>')); return; }
+      btn.disabled = true;
+
+      var sheet = el(
+        '<div class="paper-sheet"><div class="head"><div class="subj">'+esc(sName)+'</div>'+
+        '<div class="meta"><span>Total marks: '+marksTotal+'</span><span>Time: '+timeMinutes+' min</span><span>Difficulty: '+esc(diffInfo[1])+'</span></div></div>'+
+        '<pre class="thinking">Thinking&hellip; this can take up to a minute.</pre></div>'
+      );
+      out.appendChild(sheet);
+
+      var patternNotes = materialsSummaryFor(subjectSlug);
+      var prompt =
+        "You are helping an ICSE (Indian Certificate of Secondary Education) Class 9 student prepare for a school exam in "+sName+".\n\n"+
+        "What this student's own uploaded past papers and materials for this subject show (use this to match the real format and predict likely questions; if it says none, use standard ICSE Class 9 conventions):\n"+
+        (patternNotes || "(nothing uploaded yet for this subject — use standard ICSE Class 9 exam conventions)")+
+        "\n\nTask: write ONE complete practice exam paper.\n"+
+        "Chapters to cover (ONLY these; do not include questions from any other chapter): "+chapters.join(", ")+"\n"+
+        "Total marks: "+marksTotal+". Time allowed: "+timeMinutes+" minutes.\n"+
+        "Difficulty level: "+diffInfo[1]+" ("+diffInfo[2]+"). Calibrate every question to this level.\n"+
+        (omit ? ("Extra instructions from the student (follow precisely — this may list topics to omit and/or extra focus areas):\n"+omit+"\n") : "")+
+        "\nFormat it exactly like a real ICSE question paper:\n"+
+        "- A short header instruction line such as \"Answers to this Paper must be written on the paper provided separately.\"\n"+
+        "- Organise into sections the way this school actually structures papers if shown above; otherwise use the standard ICSE structure for this subject.\n"+
+        "- Number every question and put its marks in square brackets at the right, e.g. [2]\n"+
+        "- Use authentic ICSE command-word phrasing (State, Explain briefly, Give a reason for, Differentiate between, Derive, With the help of a labelled diagram…).\n"+
+        "- Where a question closely matches something the student's uploaded materials show, add \" (predicted — similar to a question you've seen before)\" right after that question, same line.\n"+
+        "- Never include a question from an omitted topic. Cover the chosen chapters thoroughly and realistically; no trivial filler.\n\n"+
+        "Output plain text only — no markdown headers, no asterisks.";
+
+      try{
+        var text = await callGemini([{text:prompt}], { maxOutputTokens:4000 });
+        var pre = sheet.querySelector("pre");
+        pre.classList.remove("thinking"); pre.textContent = text;
+        state.papers.unshift({ id:uid(), subjectSlug:subjectSlug, subjectName:sName, chapters:chapters,
+          marksTotal:marksTotal, timeMinutes:timeMinutes, difficulty:diffInfo[1], omissions:omit,
+          content:text, createdAt:new Date().toISOString() });
+        saveState();
+        renderRecentPapers(main);
+      }catch(e){
+        sheet.remove();
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }finally{ btn.disabled = false; }
+    });
+
+    renderRecentPapers(main);
+  }
+
+  async function analyzeOmissionFile(file, sName){
+    var basePrompt = "This file is a teacher's exam omission/extra-focus note or a textbook page for an ICSE Class 9 student, subject: "+sName+". "+
+      "Identify exactly which chapters, headings or sections are marked as OMITTED (not to be tested), and any marked as EXTRA FOCUS. "+
+      "Output short plain-text dash-prefixed lines only, e.g. '- Omit: <heading>' or '- Extra focus: <topic>'. No other commentary.";
+    var lowerName = file.name.toLowerCase();
+    if(file.type === "application/pdf"){
+      var b64 = await fileToBase64(file);
+      return callGemini([{inline_data:{mime_type:"application/pdf", data:b64}}, {text:basePrompt}], { maxOutputTokens:800 });
+    }else if(file.type.indexOf("image/")===0){
+      var b64i = await fileToBase64(file);
+      return callGemini([{inline_data:{mime_type:file.type, data:b64i}}, {text:basePrompt}], { maxOutputTokens:800 });
+    }else if(lowerName.endsWith(".docx")){
+      var buf = await file.arrayBuffer();
+      var result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+      var docText = (result.value||"").trim().slice(0,20000);
+      if(!docText) throw new Error("Couldn't find any text in that Word document.");
+      return callGemini([{text: basePrompt + "\n\nExtracted text:\n\n" + docText}], { maxOutputTokens:800 });
+    }else if(lowerName.endsWith(".txt") || file.type==="text/plain"){
+      var raw = (await file.text()).slice(0,20000);
+      return callGemini([{text: basePrompt + "\n\nText:\n\n" + raw}], { maxOutputTokens:800 });
+    }
+    throw new Error("Unsupported file type. Use a PDF, photo, .docx or .txt file.");
+  }
+
+  function materialsSummaryFor(slug){
+    var items = state.materials.filter(function(m){ return m.subjectSlug===slug && m.status==="done" && m.summary; })
+      .sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); })
+      .slice(0, 25);
+    return items.map(function(m){ return "["+(m.kind==="mock"?"Mock paper":"Material")+": "+m.fileName+"]\n"+m.summary; }).join("\n\n").slice(0,8000);
+  }
+
+  function renderRecentPapers(main){
+    var old = main.querySelector("#recent-papers"); if(old) old.remove();
+    var ps = state.papers.slice(0,8);
+    var wrap = el('<div class="panel" id="recent-papers"><h3 class="section-h">Recent papers</h3></div>');
+    if(ps.length===0){ wrap.appendChild(el('<div class="empty">Nothing generated yet.</div>')); }
+    else{
+      ps.forEach(function(p){
+        wrap.appendChild(el(
+          '<div class="qrow"><div class="qbody"><div class="qno">'+esc(fmtDate(p.createdAt))+' · '+esc(p.subjectName)+'</div>'+
+          '<div class="pointer">'+esc(p.marksTotal)+' marks · '+esc(p.difficulty||"")+' · '+esc((p.chapters||[]).join(", ").slice(0,70))+'</div></div></div>'
+        ));
+      });
+    }
+    main.appendChild(wrap);
+  }
+
+  // ================= MATERIAL =================
+  function renderMaterial(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Material</div><h2>What Studyio has learned</h2>'+
+      '<p>Pick a subject, then upload study material or full mock papers — PDF, Word, photo, or text. Each one gets read, analyzed, and remembered for every paper generated after.</p></div>'
+    ));
+    if(materialOpenSubject && state.subjects[materialOpenSubject]){
+      renderMaterialSubject(main, materialOpenSubject);
+      return;
+    }
+    var grid = el('<div class="grid"></div>');
+    sortedSubjects().forEach(function(s){
+      var mats = state.materials.filter(function(m){ return m.subjectSlug===s.slug && m.kind!=="mock"; });
+      var mocks = state.materials.filter(function(m){ return m.subjectSlug===s.slug && m.kind==="mock"; });
+      var card = el(
+        '<button class="card" data-slug="'+esc(s.slug)+'"><h3>'+esc(s.name)+'</h3>'+
+        '<div class="meta"><span><b class="mono">'+mats.length+'</b> materials</span><span><b class="mono">'+mocks.length+'</b> mock papers</span></div>'+
+        '<div class="meta"><span><b class="mono">'+(s.chapters||[]).length+'</b> chapters listed</span></div></button>'
+      );
+      card.addEventListener("click", function(){ materialOpenSubject = s.slug; render(); });
+      grid.appendChild(card);
+    });
+    main.appendChild(grid);
+  }
+
+  function renderMaterialSubject(main, slug){
+    var s = state.subjects[slug];
+    var back = el('<button class="backlink">&larr; All subjects</button>');
+    back.addEventListener("click", function(){ materialOpenSubject = null; render(); });
+    main.appendChild(back);
+    main.appendChild(el('<div class="page-head" style="margin-bottom:16px;"><h2>'+esc(s.name)+'</h2></div>'));
+
+    // chapters editor
+    var chPanel = el(
+      '<div class="panel"><h3 class="section-h">Chapters</h3>'+
+      '<div class="chapters-box" id="m-chapters">'+
+        (s.chapters||[]).map(function(c,i){ return '<span class="chapter-chip checked" data-i="'+i+'"><span class="chap-text" data-i="'+i+'" title="Click to rename" style="cursor:text;">'+esc(c)+'</span> <button type="button" class="linkbtn rm-chapter" data-i="'+i+'" style="margin-left:2px;">&times;</button></span>'; }).join("")+
+      '</div>'+
+      (s.chapters && s.chapters.length ? '<p style="color:var(--ink-soft);font-size:12px;margin:-2px 0 10px;">Click a chapter’s name to rename it.</p>' : '')+
+      '<div class="row" style="align-items:flex-end;margin-top:8px;">'+
+        '<div class="field" style="margin-bottom:0;"><input type="text" id="m-newchapter" placeholder="Add a chapter name"></div>'+
+        '<button class="btn small" id="m-addchapter">Add</button>'+
+      '</div></div>'
+    );
+    main.appendChild(chPanel);
+    chPanel.querySelectorAll(".rm-chapter").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var i = parseInt(btn.getAttribute("data-i"),10);
+        s.chapters.splice(i,1); saveState(); render();
+      });
+    });
+    chPanel.querySelectorAll(".chap-text").forEach(function(span){
+      span.addEventListener("click", function(){
+        var i = parseInt(span.getAttribute("data-i"),10);
+        var input = document.createElement("input");
+        input.type = "text"; input.value = s.chapters[i];
+        input.style.cssText = "font-size:13px;padding:2px 6px;border:1px solid var(--focus);border-radius:4px;width:"+Math.max(80,s.chapters[i].length*7)+"px;background:var(--surface);color:var(--ink);";
+        span.replaceWith(input);
+        input.focus(); input.select();
+        var done = false;
+        function commit(){
+          if(done) return; done = true;
+          var v = input.value.trim();
+          if(v) s.chapters[i] = v;
+          saveState(); render();
+        }
+        input.addEventListener("blur", commit);
+        input.addEventListener("keydown", function(ev){
+          if(ev.key==="Enter"){ ev.preventDefault(); commit(); }
+          else if(ev.key==="Escape"){ ev.preventDefault(); if(!done){ done=true; render(); } }
+        });
+      });
+    });
+    document.getElementById("m-addchapter").addEventListener("click", function(){
+      var input = document.getElementById("m-newchapter");
+      var v = input.value.trim(); if(!v) return;
+      s.chapters.push(v); saveState(); render();
+    });
+
+    main.appendChild(uploadSection(slug, "material", "Study materials", "Notes, textbook excerpts, syllabus, teacher handouts…"));
+    main.appendChild(uploadSection(slug, "mock", "Mock papers", "Full past tests or mock exams — upload as many as you have."));
+  }
+
+  function uploadSection(slug, kind, title, subtitle){
+    var items = state.materials.filter(function(m){ return m.subjectSlug===slug && m.kind===kind; })
+      .sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+    var panel = el(
+      '<div class="panel"><h3 class="section-h">'+esc(title)+'</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13px;margin-top:-6px;margin-bottom:12px;">'+esc(subtitle)+'</p>'+
+      '<div class="uploadbox" data-kind="'+kind+'">Click to upload (PDF, Word, photo, or text file)</div>'+
+      '<input type="file" accept="*/*" style="display:none" data-kind="'+kind+'">'+
+      '<div class="mat-list" style="margin-top:14px;">'+
+        (items.length ? items.map(materialRowHtml).join("") : '<div class="empty" style="padding:8px 0;">Nothing uploaded yet.</div>')+
+      '</div></div>'
+    );
+    var box = panel.querySelector(".uploadbox"); var input = panel.querySelector('input[type=file]');
+    box.addEventListener("click", function(){ input.click(); });
+    input.addEventListener("change", function(){ handleMaterialUpload(input, slug, kind); });
+    panel.querySelectorAll(".rm-material").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(!confirm("Remove this file? This can't be undone.")) return;
+        var id = btn.getAttribute("data-id");
+        state.materials = state.materials.filter(function(m){ return m.id!==id; });
+        saveState(); render();
+      });
+    });
+    panel.querySelectorAll(".toggle-excerpt").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var row = btn.closest(".material-item");
+        var ex = row.querySelector(".excerpt");
+        ex.hidden = !ex.hidden;
+        btn.textContent = ex.hidden ? "Show what it found" : "Hide";
+      });
+    });
+    return panel;
+  }
+
+  function materialRowHtml(m){
+    var badge = m.status==="done" ? '<span class="status-badge done">Read &amp; analyzed</span>'
+      : m.status==="failed" ? '<span class="status-badge failed">Couldn’t read this</span>'
+      : '<span class="status-badge pending">Reading&hellip;</span>';
+    var thumb = m.thumb ? '<img class="thumb" src="'+m.thumb+'">' : '<div class="thumb icon">'+esc((m.fileType||"file").split("/").pop().slice(0,4))+'</div>';
+    return '<div class="material-item" data-id="'+esc(m.id)+'">'+thumb+
+      '<div class="mbody"><div class="row1"><span class="fname">'+esc(m.fileName)+'</span>'+badge+'</div>'+
+      (m.summary ? '<button type="button" class="linkbtn toggle-excerpt">Show what it found</button><div class="excerpt" hidden>'+esc(m.summary)+'</div>' : '')+
+      '<div class="rowbtns"><button type="button" class="linkbtn rm-material" data-id="'+esc(m.id)+'">Remove</button></div></div></div>';
+  }
+
+  async function handleMaterialUpload(input, slug, kind){
+    var file = input.files[0]; if(!file) return;
+    var thumb = await makeThumbnail(file);
+    var mat = { id:uid(), subjectSlug:slug, kind:kind, fileName:file.name, fileType:file.type||"file",
+      status:"pending", summary:"", thumb:thumb, createdAt:new Date().toISOString() };
+    state.materials.unshift(mat); saveState(); render();
+
+    var sName = subjectName(slug);
+    var basePrompt = "This is "+(kind==="mock" ? "a full past mock exam/test paper" : "study material")+" for an ICSE Class 9 student, subject: "+sName+". "+
+      "Extract concise plain-text notes for future reference: section structure and mark distribution (if it's a paper), exact phrasing and command words used, topics/questions/content covered, and any marking-scheme hints visible. "+
+      "Output 5-10 short dash-prefixed lines, plain text only, no other commentary.";
+    try{
+      var text;
+      var lowerName = file.name.toLowerCase();
+      if(file.type === "application/pdf"){
+        var b64 = await fileToBase64(file);
+        text = await callGemini([{inline_data:{mime_type:"application/pdf", data:b64}}, {text:basePrompt}], { maxOutputTokens:1200 });
+      }else if(file.type.indexOf("image/")===0){
+        var b64i = await fileToBase64(file);
+        text = await callGemini([{inline_data:{mime_type:file.type, data:b64i}}, {text:basePrompt}], { maxOutputTokens:1200 });
+      }else if(lowerName.endsWith(".docx")){
+        var buf = await file.arrayBuffer();
+        var result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+        var docText = (result.value||"").trim().slice(0,20000);
+        if(!docText) throw new Error("Couldn't find any text in that Word document.");
+        text = await callGemini([{text: basePrompt + "\n\nExtracted text:\n\n" + docText}], { maxOutputTokens:1200 });
+      }else if(lowerName.endsWith(".txt") || file.type==="text/plain"){
+        var raw = (await file.text()).slice(0,20000);
+        text = await callGemini([{text: basePrompt + "\n\nText:\n\n" + raw}], { maxOutputTokens:1200 });
+      }else{
+        throw new Error("Unsupported file type here — use a PDF, photo (jpg/png), .docx or .txt file.");
+      }
+      mat.status = "done"; mat.summary = text;
+    }catch(e){
+      mat.status = "failed"; mat.summary = e && e.code ? apiErrorCopy(e) : (e.message || String(e));
+    }
+    saveState();
+    if(tab==="material") render();
+  }
+
+  // ================= ANALYSIS =================
+  function renderAnalysis(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Analysis</div><h2>Check your paper &amp; track progress</h2>'+
+      '<p>Get marked like a real ICSE script, with pointers you can actually act on — then watch your scores move over time.</p></div>'
+    ));
+    renderCheckPanel(main);
+    var progressPanel = el('<div><h3 class="section-h">Your progress</h3></div>');
+    main.appendChild(progressPanel);
+    renderProgressChart(progressPanel);
+  }
+
+  function renderCheckPanel(main){
+    var panel = el('<div class="panel"><h3 class="section-h">Check your paper</h3></div>');
+    var firstSlug = sortedSubjects()[0] ? sortedSubjects()[0].slug : "";
+    panel.innerHTML +=
+      '<div class="row">'+
+        '<div class="field"><label for="chk-subject">Subject</label><select id="chk-subject">'+
+          sortedSubjects().map(function(s){ return '<option value="'+esc(s.slug)+'">'+esc(s.name)+'</option>'; }).join("")+
+        '</select></div>'+
+        '<div class="field"><label for="chk-paper">Which paper (optional)</label><select id="chk-paper"></select></div>'+
+      '</div>'+
+      '<div class="field"><label for="chk-answers">Your answers (type them, question by question)</label>'+
+      '<textarea id="chk-answers" placeholder="1(a) ...\n1(b) ...\n2 ..." style="min-height:150px"></textarea></div>'+
+      '<div class="field"><label>Or attach photos / a PDF of your answer script (multiple pages allowed)</label>'+
+      '<div class="uploadbox" id="chk-uploadbox">Click to choose file(s)</div>'+
+      '<input type="file" id="chk-file" accept="image/*,application/pdf" multiple style="display:none">'+
+      '<div id="chk-filename" style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;"></div></div>'+
+      '<button class="btn" id="chk-btn">Check my answers</button>'+
+      '<div id="chk-status"></div><div id="chk-output"></div>';
+    main.appendChild(panel);
+
+    var subjectSel = panel.querySelector("#chk-subject");
+    var paperSel = panel.querySelector("#chk-paper");
+    function refreshPapers(){
+      var ps = state.papers.filter(function(p){ return p.subjectSlug===subjectSel.value; })
+        .sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+      paperSel.innerHTML = '<option value="">Not from this app / external test</option>' + ps.map(function(p){
+        return '<option value="'+esc(p.id)+'">'+esc(fmtDate(p.createdAt))+' &middot; '+esc(p.marksTotal)+' marks'+(p.chapters&&p.chapters.length?" — "+esc(p.chapters.join(", ").slice(0,40)):"")+'</option>';
+      }).join("");
+    }
+    refreshPapers();
+    subjectSel.addEventListener("change", refreshPapers);
+
+    var chosenFiles = [];
+    panel.querySelector("#chk-uploadbox").addEventListener("click", function(){ panel.querySelector("#chk-file").click(); });
+    panel.querySelector("#chk-file").addEventListener("change", function(){
+      chosenFiles = Array.from(this.files || []);
+      panel.querySelector("#chk-filename").textContent = chosenFiles.length ? ("Attached: "+chosenFiles.map(function(f){return f.name;}).join(", ")) : "";
+    });
+
+    panel.querySelector("#chk-btn").addEventListener("click", async function(){
+      var btn = this;
+      var slug = subjectSel.value, sName = subjectName(slug);
+      var paper = state.papers.find(function(p){ return p.id===paperSel.value; });
+      var answersText = panel.querySelector("#chk-answers").value.trim();
+      var status = panel.querySelector("#chk-status"), out = panel.querySelector("#chk-output");
+      status.innerHTML=""; out.innerHTML="";
+      if(!answersText && chosenFiles.length===0){ status.appendChild(el('<div class="notice err">Type your answers or attach a file first.</div>')); return; }
+      btn.disabled = true;
+      out.appendChild(el('<div class="empty thinking">Marking your script&hellip; this can take a minute.</div>'));
+
+      var promptText =
+        "You are grading an ICSE Class 9 student's answers the way a real ICSE examiner would: award marks for correct keywords, working/steps and structure, not just right/wrong; deduct for missing units, unlabelled diagrams, skipped working, or answers longer/shorter than their mark value deserves.\n\n"+
+        "SUBJECT: "+sName+"\n\nTHE PAPER"+(paper?"":" (none selected — if the attached file(s) contain the questions too, grade from those; otherwise grade the answers generally)")+":\n"+(paper?paper.content:"(not provided)")+"\n\n"+
+        "THE STUDENT'S ANSWERS"+(chosenFiles.length?" (also see the attached file(s), possibly multiple pages of one script)":"")+":\n"+(answersText||"(see attached file(s))")+"\n\n"+
+        "Reply with ONLY a JSON object, this exact shape, no other text:\n"+
+        '{"totalScore": number, "maxScore": number, "questions": [{"qNo": "1(a)", "max": 2, "awarded": 1.5, "pointer": "one specific, practical sentence on exactly what to change to earn full marks"}], "generalPointers": ["2-4 specific, practical sentences"], "practicalAdvice": ["2-4 sentences of concrete, applicable exam-technique advice — never generic advice like ‘study more’ or ‘practice regularly’; say exactly what habit or technique to change"]}\n'+
+        "Be honest and specific, never generically encouraging, and never vague (\"study more\", \"revise better\" are not acceptable pointers — always say exactly what to do differently). Base marks strictly on ICSE Class 9 marking-scheme conventions.";
+
+      try{
+        var parts = [];
+        for(var i=0;i<chosenFiles.length;i++){
+          var f = chosenFiles[i];
+          var b64 = await fileToBase64(f);
+          parts.push({ inline_data:{ mime_type: f.type || "application/pdf", data:b64 } });
+        }
+        parts.push({ text: promptText });
+        var text = await callGemini(parts, { maxOutputTokens:4000, json:true });
+        var data = extractJson(text);
+        out.innerHTML = "";
+        renderResult(out, data);
+        state.results.unshift({ id:uid(), paperId: paper?paper.id:null, subjectSlug:slug, subjectName:sName,
+          totalScore:data.totalScore, maxScore:data.maxScore, questions:data.questions||[],
+          generalPointers:data.generalPointers||[], practicalAdvice:data.practicalAdvice||[], createdAt:new Date().toISOString() });
+        saveState();
+      }catch(e){
+        out.innerHTML = "";
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }finally{ btn.disabled = false; }
+    });
+  }
+
+  function renderResult(container, data){
+    var pct = data.maxScore ? Math.round((data.totalScore/data.maxScore)*1000)/10 : 0;
+    container.appendChild(el(
+      '<div class="score-banner"><div><div style="font-size:12.5px;color:var(--ink-soft)">Total</div>'+
+      '<div class="num">'+esc(Math.round(data.totalScore*10)/10)+' / '+esc(data.maxScore)+'</div></div>'+
+      '<div class="mono" style="font-size:15px;color:var(--mark)">'+pct+'%</div></div>'
+    ));
+    var qwrap = el('<div class="panel"></div>');
+    (data.questions||[]).forEach(function(q){
+      qwrap.appendChild(el(
+        '<div class="qrow"><div class="circle-mark">'+esc(q.awarded)+'/'+esc(q.max)+'</div>'+
+        '<div class="qbody"><div class="qno">Question '+esc(q.qNo)+'</div><div class="pointer">'+esc(q.pointer)+'</div></div></div>'
+      ));
+    });
+    container.appendChild(qwrap);
+    if((data.generalPointers||[]).length){
+      var gp = el('<div class="panel"><h3 style="font-size:15px;margin-bottom:10px;">Where to improve</h3><ul class="advice-list"></ul></div>');
+      var ul = gp.querySelector("ul"); data.generalPointers.forEach(function(t){ ul.appendChild(el("<li>"+esc(t)+"</li>")); });
+      container.appendChild(gp);
+    }
+    if((data.practicalAdvice||[]).length){
+      var pa = el('<div class="panel"><h3 style="font-size:15px;margin-bottom:10px;">Exam-day advice</h3><ul class="advice-list"></ul></div>');
+      var ul2 = pa.querySelector("ul"); data.practicalAdvice.forEach(function(t){ ul2.appendChild(el("<li>"+esc(t)+"</li>")); });
+      container.appendChild(pa);
+    }
+  }
+
+  function renderProgressChart(container){
+    var bySubject = {};
+    state.results.forEach(function(r){
+      if(!r.maxScore) return;
+      var pct = Math.max(0, Math.min(100, (r.totalScore/r.maxScore)*100));
+      (bySubject[r.subjectSlug] = bySubject[r.subjectSlug] || []).push({ t:new Date(r.createdAt).getTime(), pct:pct, date:r.createdAt });
+    });
+    var slugs = Object.keys(bySubject);
+    if(slugs.length===0){ container.appendChild(el('<div class="panel"><div class="empty">Check a few papers to see your progress here.</div></div>')); return; }
+    slugs.forEach(function(k){ bySubject[k].sort(function(a,b){ return a.t-b.t; }); });
+    var allTimes = state.results.map(function(r){ return new Date(r.createdAt).getTime(); });
+    var minT = Math.min.apply(null, allTimes), maxT = Math.max.apply(null, allTimes);
+    if(minT===maxT){ minT -= 86400000; maxT += 86400000; }
+    var W=640, H=300, padL=38, padR=16, padT=16, padB=30;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+    function x(t){ return padL + (t-minT)/(maxT-minT)*plotW; }
+    function y(pct){ return padT + (1-pct/100)*plotH; }
+    var palette = ["#ab301c","#1f4235","#c9a227","#3b6ea5","#7a3b8f","#0e7a6b","#b3541f","#5a5a5a","#c94f8f"];
+    var parts = [];
+    [0,25,50,75,100].forEach(function(g){
+      var gy = y(g);
+      parts.push('<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--border)" stroke-width="1" />');
+      parts.push('<text x="'+(padL-6)+'" y="'+(gy+4)+'" font-size="10" text-anchor="end" fill="var(--ink-soft)" font-family="IBM Plex Mono, monospace">'+g+'</text>');
+    });
+    slugs.forEach(function(s,i){
+      var color = palette[i % palette.length];
+      var pts = bySubject[s];
+      var d = pts.map(function(p,idx){ return (idx===0?"M":"L")+x(p.t).toFixed(1)+","+y(p.pct).toFixed(1); }).join(" ");
+      parts.push('<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />');
+      pts.forEach(function(p){
+        parts.push('<circle cx="'+x(p.t).toFixed(1)+'" cy="'+y(p.pct).toFixed(1)+'" r="3.5" fill="'+color+'"><title>'+esc(subjectName(s))+': '+Math.round(p.pct)+'% on '+esc(fmtDate(p.date))+'</title></circle>');
+      });
+    });
+    var svg = '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" role="img" aria-label="Score progress over time by subject">'+parts.join("")+'</svg>';
+    var legend = '<div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;">'+slugs.map(function(s,i){
+      return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;"><span style="width:10px;height:10px;border-radius:50%;background:'+palette[i%palette.length]+';display:inline-block;"></span>'+esc(subjectName(s))+'</span>';
+    }).join("")+'</div>';
+    container.appendChild(el('<div class="panel">'+svg+legend+'</div>'));
+  }
+
+  // ================= PLANNER (coming later) =================
+  function renderPlanner(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Coming soon</div><h2>Planner</h2>'+
+      '<p>After your exams: tell it what got covered in school each day, give it your timetable and syllabus once, and it’ll plan out what to study each day — weighted toward your weaker topics from Analysis.</p></div>'
+    ));
+  }
+
+  // ================= SETTINGS =================
+  function renderSettings(main){
+    main.appendChild(el('<div class="page-head"><div class="eyebrow">Settings</div><h2>API key, subjects &amp; more</h2></div>'));
+
+    var apiPanel = el(
+      '<div class="panel"><h3 class="section-h">Gemini API key (free)</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13.5px;margin-top:-4px;">Get a free key with no credit card at '+
+      '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. It’s used only to call Gemini directly from this browser.</p>'+
+      '<div class="field"><label for="set-key">API key</label><input id="set-key" type="password" placeholder="AIza..." value="'+esc(state.apiKey)+'"></div>'+
+      '<div class="field"><label for="set-model">Model</label><select id="set-model">'+
+        MODELS.map(function(m){ return '<option value="'+m[0]+'"'+(m[0]===state.model?" selected":"")+'>'+esc(m[1])+'</option>'; }).join("")+
+      '</select></div>'+
+      '<div class="field" id="set-custom-wrap" style="'+(state.model==="custom"?"":"display:none")+'"><label for="set-custom">Custom model ID</label>'+
+      '<input id="set-custom" type="text" placeholder="e.g. gemini-2.5-flash-lite" value="'+esc(state.customModel||"")+'">'+
+      '<p style="color:var(--ink-soft);font-size:12px;margin-top:4px;">Check <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> for which models currently show as free for your account.</p></div>'+
+      '<button class="btn" id="set-save">Save</button><span id="set-saved" style="margin-left:10px;font-size:13px;color:var(--ok)"></span>'+
+      '<p style="color:var(--ink-soft);font-size:12px;margin-top:14px;">Note: on Google’s free tier, content you send may be used by Google to improve their products (this does not apply to their paid tier). Fine for study material, just worth knowing.</p>'+
+      '</div>'
+    );
+    main.appendChild(apiPanel);
+    document.getElementById("set-model").addEventListener("change", function(){
+      document.getElementById("set-custom-wrap").style.display = this.value==="custom" ? "" : "none";
+    });
+    document.getElementById("set-save").addEventListener("click", function(){
+      state.apiKey = document.getElementById("set-key").value.trim();
+      state.model = document.getElementById("set-model").value;
+      state.customModel = document.getElementById("set-custom") ? document.getElementById("set-custom").value.trim() : "";
+      saveState();
+      document.getElementById("set-saved").textContent = "Saved.";
+      setTimeout(function(){ document.getElementById("set-saved").textContent=""; }, 1800);
+    });
+
+    var subjPanel = el(
+      '<div class="panel"><h3 class="section-h">Add a subject</h3>'+
+      '<div class="row" style="align-items:flex-end">'+
+        '<div class="field" style="margin-bottom:0"><input id="lib-newsubject" type="text" placeholder="e.g. Computer Applications"></div>'+
+        '<button class="btn small" id="lib-add-btn">Add</button>'+
+      '</div><p style="color:var(--ink-soft);font-size:12.5px;margin-top:10px;">Manage chapters, materials and mock papers for a subject from the Material tab.</p></div>'
+    );
+    main.appendChild(subjPanel);
+    document.getElementById("lib-add-btn").addEventListener("click", function(){
+      var input = document.getElementById("lib-newsubject");
+      var name = input.value.trim(); if(!name) return;
+      var slug = slugify(name);
+      state.subjects[slug] = { slug:slug, name:name, chapters:[] };
+      saveState(); input.value=""; render();
+    });
+
+    var themePanel = el(
+      '<div class="panel"><h3 class="section-h">Theme</h3>'+
+      '<p style="color:var(--ink-soft);font-size:12.5px;margin-top:-4px;margin-bottom:12px;">'+
+      '&ldquo;Enchanted Academy&rdquo; is an original candlelit, parchment-and-old-ink look — inspired by the cozy magic-school aesthetic, not any specific book or film (so no house names, crests, or branding here — just the vibe).</p>'+
+      '<div class="row" id="theme-row">'+
+        THEMES.map(function(t){ return '<label class="diff-opt'+(state.theme===t[0]?" checked":"")+'" style="flex:1;min-width:160px;"><input type="radio" name="theme" value="'+t[0]+'"'+(state.theme===t[0]?" checked":"")+'>'+esc(t[1])+'</label>'; }).join("")+
+      '</div></div>'
+    );
+    main.appendChild(themePanel);
+    themePanel.querySelectorAll('input[name="theme"]').forEach(function(radio){
+      radio.addEventListener("change", function(){
+        themePanel.querySelectorAll(".diff-opt").forEach(function(o){ o.classList.remove("checked"); });
+        radio.closest(".diff-opt").classList.add("checked");
+        state.theme = radio.value; saveState();
+        document.documentElement.setAttribute("data-theme", state.theme);
+      });
+    });
+
+    var syncPanel = el(
+      '<div class="panel"><h3 class="section-h">Cross-device sync</h3>'+
+      syncStatusHtml()+
+      (FIREBASE_CONFIG ? (
+        '<div class="field"><label for="set-synccode">Sync code</label><input id="set-synccode" type="text" placeholder="a phrase only you would use" value="'+esc(getSyncCode())+'"></div>'+
+        '<button class="btn small" id="set-sync-connect">Use this code on this device</button>'+
+        '<p style="color:var(--ink-soft);font-size:12.5px;margin-top:10px;">Type the exact same code on every device to keep them in sync.</p>'
+      ) : (
+        '<p style="color:var(--ink-soft);font-size:13.5px;">Not set up yet — data stays on this device only. See SETUP.md &ldquo;Cross-device sync&rdquo; for the one-time free Firebase setup.</p>'
+      ))+
+      '</div>'
+    );
+    main.appendChild(syncPanel);
+    if(FIREBASE_CONFIG){
+      document.getElementById("set-sync-connect").addEventListener("click", function(){
+        var code = document.getElementById("set-synccode").value.trim();
+        if(!code){ alert("Enter a sync code first."); return; }
+        connectSync(code); render();
+      });
+    }
+
+    var backup = el(
+      '<div class="panel"><h3 class="section-h">Backup &amp; transfer</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13.5px;margin:0 0 14px;">Everything lives only in this browser unless synced. Export a backup before switching devices.</p>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;">'+
+        '<button class="btn secondary" id="set-export">Export backup (.json)</button>'+
+        '<button class="btn secondary" id="set-import-btn">Import backup</button>'+
+        '<button class="btn danger" id="set-clear">Erase all data on this device</button>'+
+      '</div><input type="file" id="set-import-file" accept="application/json" style="display:none"></div>'
+    );
+    main.appendChild(backup);
+    document.getElementById("set-export").addEventListener("click", function(){
+      var blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "studyio-backup-"+new Date().toISOString().slice(0,10)+".json";
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+    document.getElementById("set-import-btn").addEventListener("click", function(){ document.getElementById("set-import-file").click(); });
+    document.getElementById("set-import-file").addEventListener("change", async function(){
+      var file = this.files[0]; if(!file) return;
+      try{
+        var incoming = JSON.parse(await file.text());
+        if(!incoming || typeof incoming!=="object") throw new Error("bad file");
+        state = incoming;
+        if(!state.subjects) state.subjects = {};
+        if(!state.materials) state.materials = [];
+        if(!state.papers) state.papers = [];
+        if(!state.results) state.results = [];
+        if(!state.theme) state.theme = "enchanted";
+        saveState(); alert("Backup imported."); render();
+      }catch(e){ alert("That didn't look like a valid backup file."); }
+    });
+    document.getElementById("set-clear").addEventListener("click", async function(){
+      if(!confirm("This erases every subject, paper, result and your API key. This can't be undone. Continue?")) return;
+      var eraseCloudToo = syncDocRef ? confirm("You're synced to the cloud. Also erase the synced copy, so every device connected with this code clears too? (Cancel: only this device clears, and it will re-sync the old data back shortly.)") : false;
+      localStorage.removeItem(STORAGE_KEY);
+      state = loadState();
+      if(syncDocRef && eraseCloudToo){
+        try{ await syncDocRef.set({ payload: JSON.stringify(state), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); }catch(e){}
+      }
+      render();
+    });
+  }
+
+  function syncStatusHtml(){
+    var map = {
+      disabled: ['pending', 'Local only on this device'],
+      connecting: ['pending', 'Connecting&hellip;'],
+      "no-code": ['pending', 'Enter a sync code below to start'],
+      connected: ['done', 'Connected — syncing with any device using this code'],
+      error: ['failed', 'Couldn’t connect — check your Firebase config and internet connection']
+    };
+    var m = map[syncStatus] || map.disabled;
+    return '<span class="status-badge '+m[0]+'" style="margin-bottom:12px;display:inline-block;">'+m[1]+'</span>';
+  }
+
+  // ---------- boot ----------
+  state = loadState();
+  render();
+  document.getElementById("main").addEventListener("focusout", function(){
+    if(pendingRerender){ pendingRerender = false; render(); }
+  });
+  initSync();
+})();
+</script>
+</body>
+</html>
