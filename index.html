@@ -1,0 +1,1948 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studyio</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e2a54">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Studyio">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  /* ---- theme: chalkboard (default light, auto-dark) ---- */
+  html[data-theme="chalkboard"]{
+    --font-display:"Newsreader",Georgia,serif; --font-body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --bg:#f5f1e4; --bg-line:#ded2b1;
+    --ink:#223349; --ink-soft:#51637a;
+    --accent:#1f4235; --accent-deep:#153123; --accent-text:#eef1ea;
+    --mark:#ab301c; --mark-soft:#c96654; --mark-wash:#f5e2dd;
+    --gold:#8a611a; --gold-wash:#f1e6cb;
+    --surface:#fffdf6; --surface-2:#fbf6e8;
+    --border:#dcd0a9; --shadow:rgba(34,51,73,0.10);
+    --focus:#3b6ea5; --ok:#2f6b3a; --ok-wash:#e3ecdf;
+    --nav-bg:var(--accent); --nav-text:var(--accent-text);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    html[data-theme="chalkboard"]{
+      --bg:#152019; --bg-line:#233427;
+      --ink:#eae4d2; --ink-soft:#b7c0b2;
+      --accent:#0e1e16; --accent-deep:#0a1610; --accent-text:#eae4d2;
+      --mark:#e07a5f; --mark-soft:#b8503b; --mark-wash:#3a2420;
+      --gold:#d8b25e; --gold-wash:#3a3120;
+      --surface:#1b2a21; --surface-2:#17231c;
+      --border:#2c4032; --shadow:rgba(0,0,0,0.4);
+      --focus:#7fa8d9; --ok:#8fbf8f; --ok-wash:#203122;
+      --nav-bg:var(--accent); --nav-text:var(--accent-text);
+      color-scheme: dark;
+    }
+  }
+  /* ---- theme: enchanted academy (original candlelit/parchment look, default) ---- */
+  html[data-theme="enchanted"]{
+    --font-display:"Cinzel",Georgia,serif; --font-body:"EB Garamond",Georgia,serif;
+    --bg:#221a12; --bg-line:#2f2417;
+    --ink:#ecdfc0; --ink-soft:#c3b083;
+    --accent:#4a1620; --accent-deep:#330e16; --accent-text:#f1e2bd;
+    --mark:#c9a227; --mark-soft:#8f7220; --mark-wash:#3a2f18;
+    --gold:#c9a227; --gold-wash:#3a2f18;
+    --surface:#2b2116; --surface-2:#241b11;
+    --border:#4a3c26; --shadow:rgba(0,0,0,0.5);
+    --focus:#7fa8d9; --ok:#7fae6f; --ok-wash:#22301c;
+    --nav-bg:var(--accent); --nav-text:var(--accent-text);
+    color-scheme: dark;
+  }
+  /* ---- theme: chatbot light (clean, minimal, default) ---- */
+  html[data-theme="chatbot"]{
+    --font-display:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif; --font-body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --bg:#ffffff; --bg-line:#ececef;
+    --ink:#111318; --ink-soft:#6b7280;
+    --accent:#28365e; --accent-deep:#1b2745; --accent-text:#eef1f8;
+    --mark:#dc2626; --mark-soft:#f0a6a6; --mark-wash:#fef2f2;
+    --gold:#b45309; --gold-wash:#fef3e2;
+    --surface:#ffffff; --surface-2:#f5f6f8;
+    --border:#e5e7eb; --shadow:rgba(17,19,24,0.06);
+    --focus:#7fa1cc; --ok:#16a34a; --ok-wash:#f0fdf4;
+    --nav-bg:var(--accent); --nav-text:var(--accent-text);
+    color-scheme: light;
+  }
+  /* ---- theme: six gems (original — inspired by colorful mystical gems,
+     not any specific film/comic branding: no character names, logos or
+     insignia, just a starfield backdrop and a six-colour accent motif) ---- */
+  html[data-theme="gems"]{
+    --font-display:"Cinzel",Georgia,serif; --font-body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --bg:#0d0b1a; --bg-line:#1c1730;
+    --ink:#f0eefc; --ink-soft:#b6afd6;
+    --accent:#7c3aed; --accent-deep:#5b21b6; --accent-text:#ffffff;
+    --mark:#ef4444; --mark-soft:#f8817a; --mark-wash:#2a1414;
+    --gold:#eab308; --gold-wash:#2a2410;
+    --surface:#161129; --surface-2:#1f1938;
+    --border:#332a56; --shadow:rgba(0,0,0,0.45);
+    --focus:#38bdf8; --ok:#22c55e; --ok-wash:#132a1c;
+    --nav-bg:var(--accent); --nav-text:var(--accent-text);
+    color-scheme: dark;
+  }
+  .brand .gems-bar{ display:none; height:4px; border-radius:999px; margin-top:8px;
+    background:linear-gradient(90deg,#7c3aed,#38bdf8,#22c55e,#eab308,#f97316,#ef4444); }
+  html[data-theme="gems"] .brand .gems-bar{ display:block; }
+  /* ---- theme: custom colour (fixed light layout; --accent/--accent-deep/
+     --accent-text/--focus/--bg/--surface/--surface-2/--bg-line/--border get
+     overridden inline via JS based on the user's chosen colour — see
+     applyCustomAccent(). --nav-bg/--nav-text are NOT overridden by JS: the
+     side menu stays a calm fixed dark blue no matter how bright the picked
+     colour is, so a vivid pick never turns the whole menu garish. ---- */
+  html[data-theme="custom"]{
+    --font-display:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif; --font-body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --bg:#f7f7f8; --bg-line:#e9e9ee;
+    --ink:#16181d; --ink-soft:#6b7280;
+    --accent:#2563eb; --accent-deep:#1d4ed8; --accent-text:#ffffff;
+    --mark:#dc2626; --mark-soft:#f0a6a6; --mark-wash:#fef2f2;
+    --gold:#b45309; --gold-wash:#fef3e2;
+    --surface:#ffffff; --surface-2:#f0f1f4;
+    --border:#e2e3e8; --shadow:rgba(17,19,24,0.06);
+    --focus:#2563eb; --ok:#16a34a; --ok-wash:#f0fdf4;
+    --nav-bg:#1e2a54; --nav-text:#eef1f8;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:var(--font-body); font-size:15px; line-height:1.55;
+  }
+  h1,h2,h3{ font-family:var(--font-display); text-wrap:balance; margin:0; color:var(--ink); }
+  html[data-theme="enchanted"] h1, html[data-theme="enchanted"] h2, html[data-theme="enchanted"] h3{ letter-spacing:.02em; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+  a{ color:var(--focus) }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+
+  .app{ min-height:100vh; }
+  .topbar{
+    position:sticky; top:0; z-index:15; display:flex; align-items:center; gap:12px;
+    padding:12px 16px; background:var(--surface); border-bottom:1px solid var(--border);
+  }
+  .hamburger{
+    background:none; border:none; color:var(--ink); font-size:22px; line-height:1; cursor:pointer;
+    padding:4px 9px; border-radius:8px; flex-shrink:0;
+  }
+  .hamburger:hover{ background:var(--surface-2); }
+  .topbar-title{ font-family:var(--font-display); font-weight:600; font-size:17px; color:var(--ink); }
+
+  .drawer-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:29;
+    opacity:0; visibility:hidden; transition:opacity .2s ease;
+  }
+  .drawer-backdrop.open{ opacity:1; visibility:visible; }
+
+  .nav{
+    width:250px; max-width:82vw; background:var(--nav-bg); color:var(--nav-text);
+    display:flex; flex-direction:column; gap:2px; padding:20px 12px;
+    position:fixed; top:0; left:0; height:100vh; overflow-y:auto; z-index:30;
+    transform:translateX(-100%); transition:transform .22s ease;
+  }
+  .nav.open{ transform:translateX(0); }
+  .brand{ padding:4px 10px 18px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .brand .eyebrow{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.65; }
+  .brand h1{ font-size:20px; color:var(--nav-text); font-weight:600; margin-top:2px; }
+  .nav-close{ background:none; border:none; color:var(--nav-text); opacity:.7; font-size:20px; cursor:pointer; padding:2px 6px; border-radius:6px; flex-shrink:0; }
+  .nav-close:hover{ opacity:1; background:rgba(238,241,234,0.12); }
+  .navbtn{
+    display:flex; align-items:center; gap:10px; text-align:left; width:100%;
+    background:transparent; border:none; color:var(--nav-text); opacity:.78;
+    padding:10px 12px; border-radius:8px; font-size:14px; cursor:pointer;
+  }
+  .navbtn .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.5; flex-shrink:0; }
+  .navbtn:hover{ background:rgba(238,241,234,0.08); opacity:1; }
+  .navbtn.active{ background:rgba(238,241,234,0.14); opacity:1; font-weight:600; }
+  .navbtn.disabled{ opacity:.4; }
+  .nav-footer{ margin-top:auto; padding:12px 12px 4px; font-size:11.5px; opacity:.55; line-height:1.5; }
+
+  main{ padding:28px clamp(16px,4vw,44px) 60px; }
+  .page-head{ margin-bottom:22px; }
+  .page-head .eyebrow{ font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); font-weight:600; }
+  .page-head h2{ font-size:26px; margin-top:4px; }
+  .page-head p{ color:var(--ink-soft); margin-top:6px; max-width:62ch; font-size:14px; }
+  .section-h{ font-size:17px; margin-bottom:12px; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:16px; box-shadow:0 1px 2px var(--shadow); cursor:pointer; text-align:left;
+    display:flex; flex-direction:column; gap:8px; width:100%; color:var(--ink);
+  }
+  .card:hover{ border-color:var(--focus); }
+  .card h3{ font-size:16.5px; font-weight:600; }
+  .card .meta{ display:flex; gap:14px; font-size:12.5px; color:var(--ink-soft); flex-wrap:wrap; }
+  .card .meta b{ color:var(--ink); font-family:"IBM Plex Mono",monospace; }
+  .pill{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; padding:3px 9px;
+    border-radius:999px; background:var(--gold-wash); color:var(--gold); font-weight:600; width:fit-content;
+  }
+
+  label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; letter-spacing:.02em; }
+  select, input[type=text], input[type=number], input[type=password], textarea{
+    width:100%; background:var(--surface); color:var(--ink); border:1px solid var(--border);
+    border-radius:8px; padding:9px 11px; font-family:var(--font-body); font-size:14px;
+  }
+  textarea{ resize:vertical; min-height:90px; font-family:var(--font-body); }
+  .field{ margin-bottom:16px; }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .row > .field{ flex:1; min-width:150px; }
+
+  .btn{
+    background:var(--accent); color:var(--accent-text); border:none; border-radius:8px;
+    padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover{ background:var(--accent-deep); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn.secondary{ background:transparent; color:var(--ink); border:1px solid var(--border); }
+  .btn.secondary:hover{ border-color:var(--focus); }
+  .btn.danger{ background:transparent; color:var(--mark); border:1px solid var(--mark-soft); }
+  .btn.small{ padding:6px 12px; font-size:12.5px; }
+  .linkbtn{ background:none; border:none; color:var(--focus); cursor:pointer; font-size:13px; padding:0; text-decoration:underline; }
+
+  .panel{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; }
+
+  .chapters-box{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .chapter-chip{ display:flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:6px 12px; font-size:13px; cursor:pointer; user-select:none; }
+  .chapter-chip input{ accent-color:var(--accent); margin:0; }
+  .chapter-chip.checked{ border-color:var(--gold); background:var(--gold-wash); }
+  .chaptools{ display:flex; gap:12px; margin-top:6px; margin-bottom:14px; }
+  .chip-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .chip-dot-pending{ background:var(--gold); }
+  .chip-dot-covered{ background:var(--focus); }
+  .chip-dot-revised{ background:var(--ok); }
+  .chip-dot-mastered{ background:var(--accent); }
+  .chapter-group{ border:1px solid var(--border); border-radius:10px; margin-bottom:10px; background:var(--surface); overflow:hidden; flex:1 1 100%; }
+  .chapter-group summary{ cursor:pointer; list-style:none; padding:10px 14px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; color:var(--ink); }
+  .chapter-group summary::-webkit-details-marker{ display:none; }
+  .chapter-group summary::before{ content:"\25B8"; font-size:11px; color:var(--ink-soft); display:inline-block; transition:transform .15s; }
+  .chapter-group[open] summary::before{ transform:rotate(90deg); }
+  .chapter-group-count{ margin-left:auto; font-size:11px; color:var(--ink-soft); background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:1px 8px; }
+  .chapter-group-body{ display:flex; flex-wrap:wrap; gap:8px; padding:2px 14px 14px; }
+
+  .home-hero{ padding:30px 2px 26px; }
+  .home-greeting{ font-family:var(--font-display); font-size:28px; font-weight:600; color:var(--ink); }
+  .home-quote{ margin-top:10px; font-style:italic; color:var(--ink-soft); font-size:15px; max-width:54ch; }
+  .home-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:18px; }
+  .home-tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px;
+    text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:6px; color:var(--ink);
+    box-shadow:0 1px 2px var(--shadow); transition:border-color .15s, transform .15s; width:100%;
+  }
+  .home-tile:hover{ border-color:var(--focus); transform:translateY(-2px); }
+  .home-tile-icon{ font-size:22px; }
+  .home-tile-title{ font-weight:600; font-size:15px; font-family:var(--font-body); }
+  .home-tile-desc{ font-size:12.5px; color:var(--ink-soft); }
+  .home-snapshot{ font-size:12.5px; color:var(--ink-soft); padding-top:2px; }
+  .chat-panel-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .chat-messages{ display:flex; flex-direction:column; gap:10px; max-height:48vh; min-height:20px; overflow-y:auto; padding:2px 2px 4px; }
+  .chat-msg{ max-width:88%; padding:10px 14px; border-radius:14px; font-size:14px; line-height:1.5; white-space:pre-wrap; }
+  .chat-msg.user{ align-self:flex-end; background:var(--accent); color:var(--accent-text); border-bottom-right-radius:4px; }
+  .chat-msg.assistant{ align-self:flex-start; background:var(--surface-2); border:1px solid var(--border); color:var(--ink); border-bottom-left-radius:4px; }
+  .chat-msg.thinking{ font-style:italic; opacity:.7; }
+  .chat-input-row{ display:flex; gap:8px; align-items:flex-end; margin-top:10px; }
+  .chat-input-row textarea{
+    flex:1; min-height:42px; max-height:120px; resize:none; font-family:var(--font-body);
+    background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:14px;
+  }
+
+  .diff-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .diff-opt{ flex:1; min-width:120px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; cursor:pointer; font-size:12.5px; text-align:center; background:var(--surface-2); }
+  .diff-opt.checked{ border-color:var(--gold); background:var(--gold-wash); color:var(--gold); font-weight:600; }
+  .diff-opt input{ display:none; }
+
+  .paper-sheet{
+    background: linear-gradient(var(--bg-line) 1px, transparent 1px);
+    background-size: 100% 28px; background-color:var(--surface-2);
+    border:1px solid var(--border); border-radius:10px; padding:22px 20px 26px; margin-top:16px;
+  }
+  .paper-sheet .head{ border:1.5px solid var(--ink); border-radius:6px; padding:12px 14px; margin-bottom:16px; background:var(--surface); }
+  .paper-sheet .head .subj{ font-family:var(--font-display); font-size:19px; font-weight:600; }
+  .paper-sheet .head .meta{ display:flex; gap:18px; font-size:12.5px; color:var(--ink-soft); margin-top:6px; font-family:"IBM Plex Mono",monospace; flex-wrap:wrap; }
+  .paper-sheet pre{ white-space:pre-wrap; font-family:var(--font-display); font-size:15.5px; line-height:1.85; margin:0; color:var(--ink); }
+  .thinking{ color:var(--ink-soft); font-style:italic; }
+
+  .qrow{ display:flex; gap:14px; align-items:flex-start; padding:12px 0; border-bottom:1px dashed var(--border); }
+  .qrow:last-child{ border-bottom:none; }
+  .circle-mark{
+    flex-shrink:0; width:44px; height:44px; border-radius:50%; border:2px solid var(--mark);
+    color:var(--mark); display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:12.5px; transform:rotate(-4deg); text-align:center;
+  }
+  .qrow .qbody{ flex:1; min-width:0; }
+  .qrow .qno{ font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-soft); margin-bottom:2px; }
+  .qrow .pointer{ font-size:14px; }
+  .score-banner{
+    display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+    background:var(--mark-wash); border:1px solid var(--mark-soft); border-radius:10px;
+    padding:14px 18px; margin-bottom:18px; flex-wrap:wrap;
+  }
+  .score-banner .num{ font-family:"IBM Plex Mono",monospace; font-size:28px; color:var(--mark); font-weight:600; }
+  .advice-list{ margin:0; padding-left:18px; font-size:14px; }
+  .advice-list li{ margin-bottom:6px; }
+
+  .uploadbox{ border:1.5px dashed var(--border); border-radius:10px; padding:16px; text-align:center; font-size:13px; color:var(--ink-soft); cursor:pointer; }
+  .uploadbox:hover{ border-color:var(--focus); }
+
+  .notice{ background:var(--gold-wash); color:var(--gold); border:1px solid var(--gold); border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+  .notice.err{ background:var(--mark-wash); color:var(--mark); border-color:var(--mark-soft); }
+  .notice.ok{ background:var(--ok-wash); color:var(--ok); border-color:var(--ok); }
+
+  .material-item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+  .material-item:last-child{ border-bottom:none; }
+  .thumb{ width:52px; height:52px; border-radius:8px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--surface-2); }
+  .thumb.icon{ display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--ink-soft); font-family:"IBM Plex Mono",monospace; text-transform:uppercase; }
+  .material-item .mbody{ flex:1; min-width:0; }
+  .material-item .row1{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .material-item .fname{ font-weight:600; font-size:13.5px; }
+  .status-badge{ font-size:11px; padding:2px 8px; border-radius:999px; font-weight:600; flex-shrink:0; }
+  .status-badge.pending{ background:var(--gold-wash); color:var(--gold); }
+  .status-badge.done{ background:var(--ok-wash); color:var(--ok); }
+  .status-badge.failed{ background:var(--mark-wash); color:var(--mark); }
+  .material-item .excerpt{ font-size:12.5px; color:var(--ink-soft); margin-top:6px; white-space:pre-wrap; }
+  .material-item .rowbtns{ display:flex; gap:10px; margin-top:6px; }
+
+  .empty{ color:var(--ink-soft); font-size:14px; padding:20px 0; }
+  .backlink{ background:none; border:none; color:var(--focus); cursor:pointer; font-size:13px; margin-bottom:14px; padding:0; text-decoration:underline; }
+
+  @media (max-width:760px){
+    main{ padding:20px 16px 50px; }
+    .topbar{ padding:10px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <button class="hamburger" id="hamburger-btn" aria-label="Open menu">&#9776;</button>
+    <div class="topbar-title">Studyio</div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <nav class="nav" id="drawer">
+    <div class="brand">
+      <div>
+        <div class="eyebrow">ICSE &middot; Class 9</div>
+        <h1>Studyio</h1>
+        <div class="gems-bar"></div>
+      </div>
+      <button class="nav-close" id="nav-close-btn" aria-label="Close menu">&times;</button>
+    </div>
+    <button class="navbtn" data-tab="home"><span class="dot"></span>&#127968; Home</button>
+    <button class="navbtn" data-tab="papers"><span class="dot"></span>&#128221; Papers</button>
+    <button class="navbtn" data-tab="material"><span class="dot"></span>&#128218; Material</button>
+    <button class="navbtn" data-tab="analysis"><span class="dot"></span>&#128202; Analysis</button>
+    <button class="navbtn" data-tab="planner"><span class="dot"></span>&#128197; Planner</button>
+    <button class="navbtn" data-tab="settings"><span class="dot"></span>&#9881;&#65039; Settings</button>
+    <div class="nav-footer">Runs in this browser on your own free Gemini key. Nothing leaves your device except straight to Google when you ask it something.</div>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DEFAULT_SUBJECTS = [
+    ["mathematics","Mathematics"],["physics","Physics"],["chemistry","Chemistry"],
+    ["biology","Biology"],["english-language","English Language"],["english-literature","English Literature"],
+    ["history-civics","History & Civics"],["geography","Geography"],["hindi","Hindi"]
+  ];
+  var CHAPTER_SEED = {
+    "mathematics": ["Rational & Irrational Numbers","Compound Interest","Expansions","Factorisation","Simultaneous Equations","Indices","Logarithms","Triangles & Congruency","Pythagoras Theorem","Rectilinear Figures","Circle","Statistics & Mean/Median","Mensuration (Area/Volume)","Trigonometrical Ratios","Coordinate Geometry"],
+    "physics": ["Measurements & Experimentation","Motion in One Dimension","Laws of Motion","Fluids","Heat & Energy","Reflection of Light","Sound","Current Electricity","Magnetism"],
+    "chemistry": ["Language of Chemistry","Chemical Changes & Reactions","Water","Atomic Structure & Bonding","The Periodic Table","Study of Hydrogen","Gas Laws","Atmospheric Pollution"],
+    "biology": ["Cell Structure","Flora & Fauna of India","Diversity of Organisms","Bacteria & Fungi","Plant Nutrition & Reproduction","Transpiration","Photosynthesis","Skeletal & Muscular System","Digestive System","Circulatory System","Respiratory System"],
+    "english-language": ["Composition / Essay Writing","Formal & Informal Letters","Comprehension","Grammar","Précis Writing"],
+    "english-literature": ["Prescribed Poems","Prescribed Short Stories","Prescribed Play","Prescribed Novel"],
+    "history-civics": ["The French Revolution","Age of Napoleon","Industrial Revolution","First War of Independence 1857","The Indian Constitution","Union Legislature"],
+    "geography": ["Location & Extent of India","Structure & Physiography","Drainage","Climate","Natural Vegetation","Soils"],
+    "hindi": ["Gadya (Prose)","Padya (Poetry)","Vyakaran (Grammar)","Rachna (Composition)"]
+  };
+  var DIFFICULTIES = [
+    [1,"1 · Easy","direct recall, straightforward"],
+    [2,"2 · Below Average","simple, single-step application"],
+    [3,"3 · Average","a typical school class test"],
+    [4,"4 · Above Average","multi-step, tricky application"],
+    [5,"5 · Very Hard","board-level, twisted HOTS questions"]
+  ];
+  var MODELS = [
+    ["gemini-3.6-flash","Gemini 3.6 Flash — recommended (free tier)"],
+    ["gemini-3.5-flash","Gemini 3.5 Flash — alternative"],
+    ["gemini-3.1-flash-lite","Gemini 3.1 Flash-Lite — fastest & lightest"],
+    ["custom","Custom model ID…"]
+  ];
+  var RETIRED_MODELS = ["gemini-2.5-flash","gemini-2.5-flash-lite","gemini-2.5-pro","gemini-2.0-flash"];
+  var DAYS = [["mon","Monday"],["tue","Tuesday"],["wed","Wednesday"],["thu","Thursday"],["fri","Friday"],["sat","Saturday"]];
+  var CHAPTER_STATUSES = [["pending","Pending"],["covered","Covered in class"],["revised","Revised once"],["mastered","Mastered"]];
+  var STATUS_WEIGHT = { pending:3, covered:2, revised:1, mastered:0 };
+  var THEMES = [
+    ["chatbot","Chatbot Light (default)"],
+    ["chalkboard","Chalkboard & Chalk"],
+    ["enchanted","Enchanted Academy"],
+    ["gems","Six Gems"],
+    ["custom","Custom Colour"]
+  ];
+  var CUSTOM_ACCENT_PRESETS = ["#2563eb","#059669","#dc2626","#7c3aed","#ea580c","#db2777","#0891b2","#4b5563"];
+  var HOME_QUOTES = [
+    "Small steps, repeated daily, beat big pushes done rarely.",
+    "You don't need to feel ready — you just need to start the next chapter.",
+    "Most progress happens in the boring parts: the revision, the redoing, the double-checking.",
+    "A blank page isn't proof you have nothing to say. It's proof you haven't started yet.",
+    "The chapter you keep avoiding is usually the one worth ten extra minutes.",
+    "Today's effort is a note you're writing to your exam-week self.",
+    "Confusion is just understanding that hasn't arrived yet.",
+    "Habits carry you further than motivation ever will.",
+    "Consistency quietly turns ‘I’ll try’ into ‘I did’.",
+    "Every practice paper is a rehearsal, not a verdict."
+  ];
+
+  // ---------- "Custom Colour" theme: apply the user's chosen accent hue ----------
+  function hexToRgb(hex){
+    hex = (hex||"").replace("#","");
+    if(hex.length===3) hex = hex.split("").map(function(c){ return c+c; }).join("");
+    var n = parseInt(hex,16);
+    if(isNaN(n)) return {r:37,g:99,b:235};
+    return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+  }
+  function rgbToHex(r,g,b){
+    function h(v){ v=Math.max(0,Math.min(255,Math.round(v))); var s=v.toString(16); return s.length===1?"0"+s:s; }
+    return "#"+h(r)+h(g)+h(b);
+  }
+  function shadeHex(hex, amt){ // amt 0..1, higher = darker
+    var c = hexToRgb(hex);
+    return rgbToHex(c.r*(1-amt), c.g*(1-amt), c.b*(1-amt));
+  }
+  function contrastTextForHex(hex){
+    var c = hexToRgb(hex);
+    var luminance = (0.299*c.r + 0.587*c.g + 0.114*c.b) / 255;
+    return luminance > 0.6 ? "#16181d" : "#ffffff";
+  }
+  function tintWithWhite(hex, amt){ // amt 0..1 = how much of hex is mixed into white
+    var c = hexToRgb(hex);
+    return rgbToHex(255*(1-amt) + c.r*amt, 255*(1-amt) + c.g*amt, 255*(1-amt) + c.b*amt);
+  }
+  function applyCustomAccent(hex){
+    var root = document.documentElement.style;
+    // Buttons/links/focus rings use the picked colour directly.
+    root.setProperty("--accent", hex);
+    root.setProperty("--accent-deep", shadeHex(hex, 0.18));
+    root.setProperty("--accent-text", contrastTextForHex(hex));
+    root.setProperty("--focus", hex);
+    // Backgrounds/surfaces (and the top bar, which uses --surface) get just a
+    // faint tint of the picked colour instead of staying plain white, so the
+    // whole page reads as one coherent colour instead of clashing with it.
+    // Note: --nav-bg/--nav-text are deliberately left alone here — the side
+    // menu stays a fixed calm dark blue regardless of the picked colour.
+    root.setProperty("--bg", tintWithWhite(hex, 0.05));
+    root.setProperty("--surface", tintWithWhite(hex, 0.02));
+    root.setProperty("--surface-2", tintWithWhite(hex, 0.08));
+    root.setProperty("--bg-line", tintWithWhite(hex, 0.14));
+    root.setProperty("--border", tintWithWhite(hex, 0.12));
+  }
+  function clearCustomAccentOverride(){
+    var root = document.documentElement.style;
+    root.removeProperty("--accent"); root.removeProperty("--accent-deep");
+    root.removeProperty("--accent-text"); root.removeProperty("--focus");
+    root.removeProperty("--bg"); root.removeProperty("--surface");
+    root.removeProperty("--surface-2"); root.removeProperty("--bg-line");
+    root.removeProperty("--border");
+  }
+  var STORAGE_KEY = "answerScriptData_v2";
+  var SYNC_CODE_KEY = "answerScriptSyncCode_v1";
+
+  // ---------- optional "Sign in with Google" auto API-key setup ----------
+  // Fill this in after doing the Google Cloud Console setup in SETUP.md
+  // ("Sign in with Google" section). Leave null to hide the feature and
+  // only offer the manual "paste your own key" flow.
+  var GOOGLE_CLIENT_ID = "214254128115-fp3e41kqa90c850p292v5gn4acf92o6s.apps.googleusercontent.com";
+  var googleSignInBusy = false, googleSignInStatus = "", googleSignInError = "";
+
+  // ---------- optional cross-device cloud sync ----------
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDsVUL6BRAN_jTwKkmUdN1K5HrcX8PKa4I",
+    authDomain: "studyio-f6e5d.firebaseapp.com",
+    projectId: "studyio-f6e5d",
+    storageBucket: "studyio-f6e5d.firebasestorage.app",
+    messagingSenderId: "391826898466",
+    appId: "1:391826898466:web:b874d48b684826631f547b"
+  };
+  var fbDb = null, syncDocRef = null, syncUnsub = null, cloudPushTimer = null;
+  var syncStatus = FIREBASE_CONFIG ? "connecting" : "disabled";
+  var pendingRerender = false, applyingRemote = false;
+
+  function getSyncCode(){ try{ return localStorage.getItem(SYNC_CODE_KEY) || ""; }catch(e){ return ""; } }
+  function setSyncCodeLocal(code){ try{ localStorage.setItem(SYNC_CODE_KEY, code); }catch(e){} }
+  async function initSync(){
+    if(!FIREBASE_CONFIG){ syncStatus = "disabled"; return; }
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      fbDb = firebase.firestore();
+      await firebase.auth().signInAnonymously();
+      var code = getSyncCode();
+      if(code) connectSync(code); else syncStatus = "no-code";
+    }catch(e){ console.warn("sync init failed", e); syncStatus = "error"; }
+    if(tab==="settings") render();
+  }
+  function connectSync(code){
+    if(!fbDb || !code) return;
+    if(syncUnsub){ syncUnsub(); syncUnsub = null; }
+    syncStatus = "connecting"; setSyncCodeLocal(code);
+    syncDocRef = fbDb.collection("syncs").doc(code);
+    syncUnsub = syncDocRef.onSnapshot(function(snap){
+      syncStatus = "connected";
+      if(snap.exists){
+        var remote = snap.data();
+        if(remote && remote.payload){
+          var currentStr = JSON.stringify(state);
+          if(remote.payload !== currentStr){
+            applyingRemote = true;
+            var changedByNormalize = false;
+            try{
+              var incoming = JSON.parse(remote.payload);
+              var beforeNorm = JSON.stringify(incoming);
+              incoming = normalizeState(incoming);
+              changedByNormalize = JSON.stringify(incoming) !== beforeNorm;
+              state = incoming;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            }catch(e){}
+            applyingRemote = false;
+            if(changedByNormalize) pushToCloud(true); // fix the stale value in the cloud too, so it stops coming back
+            var activeTag = document.activeElement && document.activeElement.tagName;
+            if(activeTag==="INPUT" || activeTag==="TEXTAREA" || activeTag==="SELECT") pendingRerender = true;
+            else render();
+          }
+        }
+      }else{ pushToCloud(true); }
+    }, function(err){ console.warn("sync error", err); syncStatus = "error"; if(tab==="settings") render(); });
+  }
+  function pushToCloud(immediate){
+    if(!syncDocRef || applyingRemote) return;
+    if(cloudPushTimer) clearTimeout(cloudPushTimer);
+    var doPush = function(){
+      syncDocRef.set({ payload: JSON.stringify(state), updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+        .catch(function(e){ console.warn("cloud push failed", e); });
+    };
+    if(immediate) doPush(); else cloudPushTimer = setTimeout(doPush, 800);
+  }
+
+  // ---------- "Sign in with Google" -> auto-create a free Gemini key ----------
+  // This asks for a broad "cloud-platform" permission so it can create a
+  // brand-new Google Cloud project on the signed-in person's own account,
+  // turn on the Gemini API in it, and mint an API key — all without them
+  // ever touching aistudio.google.com. Because that permission is one of
+  // Google's "restricted" scopes, it only works for Google accounts the app
+  // owner has explicitly added as a "test user" in Google Cloud Console
+  // (see SETUP.md), and it will usually fail on school/managed accounts
+  // whose admin has locked down project creation.
+  function startGoogleSignIn(){
+    if(!GOOGLE_CLIENT_ID){ alert("Sign in with Google hasn't been set up for this copy of the app yet. Use the manual API key option below instead."); return; }
+    if(!window.google || !google.accounts || !google.accounts.oauth2){
+      alert("Google's sign-in script hasn't loaded (maybe no internet, or it's blocked on this network). Try again in a moment, or use the manual API key option below.");
+      return;
+    }
+    googleSignInBusy = true; googleSignInError = ""; googleSignInStatus = "Waiting for Google sign-in…";
+    render();
+    try{
+      var tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: "https://www.googleapis.com/auth/cloud-platform",
+        callback: async function(resp){
+          if(!resp || resp.error || !resp.access_token){
+            googleSignInBusy = false;
+            googleSignInError = resp && resp.error ? ("Google sign-in was cancelled or blocked (" + resp.error + ").") : "Google sign-in didn't return a token.";
+            render(); return;
+          }
+          try{
+            var key = await provisionGeminiKey(resp.access_token, function(msg){ googleSignInStatus = msg; render(); });
+            state.apiKey = key;
+            state.model = state.model || "gemini-3.6-flash";
+            saveState();
+            googleSignInBusy = false; googleSignInStatus = "Done — your own free API key is set up and saved.";
+            render();
+          }catch(e){
+            googleSignInBusy = false;
+            googleSignInError = e && e.message ? e.message : "Something went wrong setting up your key.";
+            render();
+          }
+        }
+      });
+      tokenClient.requestAccessToken();
+    }catch(e){
+      googleSignInBusy = false;
+      googleSignInError = "Couldn't start Google sign-in: " + (e && e.message ? e.message : e);
+      render();
+    }
+  }
+
+  // Polls a long-running Google Cloud "Operation" until it's done.
+  function pollGcpOperation(apiBase, opName, accessToken){
+    return new Promise(function(resolve, reject){
+      var attempts = 0;
+      var check = function(){
+        attempts++;
+        fetch(apiBase + "/" + opName, { headers: { Authorization: "Bearer " + accessToken } })
+          .then(function(res){ return res.json().then(function(json){ return {res:res, json:json}; }); })
+          .then(function(r){
+            if(!r.res.ok){ reject(new Error(humanizeGcpError(r.json))); return; }
+            if(r.json.done){
+              if(r.json.error){ reject(new Error(r.json.error.message || "Google Cloud reported an error finishing the operation.")); return; }
+              resolve(r.json);
+            }else if(attempts >= 25){
+              reject(new Error("Google Cloud is taking a long time to finish setting up your project. Try again in a minute."));
+            }else{
+              setTimeout(check, 1500);
+            }
+          })
+          .catch(function(e){ reject(new Error("Network error while checking Google Cloud: " + e.message)); });
+      };
+      check();
+    });
+  }
+
+  function humanizeGcpError(json){
+    var msg = (json && json.error && json.error.message) || "Something went wrong talking to Google Cloud.";
+    var lower = msg.toLowerCase();
+    if(lower.indexOf("quota")!==-1 || lower.indexOf("maximum number of projects")!==-1){
+      return "This Google account has hit its free project limit, so a new one couldn't be created. Try a different Google account, or use the manual API key option below.";
+    }
+    if(lower.indexOf("permission")!==-1 || lower.indexOf("forbidden")!==-1 || lower.indexOf("policy")!==-1 || lower.indexOf("not authorized")!==-1){
+      return "This Google account isn't allowed to create cloud projects (common on school/managed accounts). Try a personal Gmail account, or use the manual API key option below.";
+    }
+    if(lower.indexOf("has not been used")!==-1 || lower.indexOf("disabled")!==-1){
+      return "Google is still turning on a required service. Wait about 30 seconds and try again.";
+    }
+    if(lower.indexOf("not been granted")!==-1 || lower.indexOf("access_denied")!==-1 || lower.indexOf("unverified")!==-1){
+      return "Google blocked this because the app isn't verified and this account isn't on the test-user list yet. Ask whoever set up this app to add your Google email as a test user (SETUP.md).";
+    }
+    return msg + " If this keeps happening, use the manual API key option below instead.";
+  }
+
+  // Creates a brand-new Google Cloud project on the signed-in person's
+  // account, turns on the Gemini API in it, and mints an API key restricted
+  // to that API — then returns the key string. `onStatus` is called with
+  // short progress messages to show in the UI.
+  async function provisionGeminiKey(accessToken, onStatus){
+    var authHeaders = { Authorization: "Bearer " + accessToken, "Content-Type": "application/json" };
+    var projectId = "studyio-" + Math.random().toString(36).slice(2, 10);
+
+    onStatus("Creating your own Google Cloud project…");
+    var createRes = await fetch("https://cloudresourcemanager.googleapis.com/v3/projects", {
+      method: "POST", headers: authHeaders,
+      body: JSON.stringify({ projectId: projectId, displayName: "Studyio" })
+    });
+    var createJson = await createRes.json();
+    if(!createRes.ok) throw new Error(humanizeGcpError(createJson));
+    await pollGcpOperation("https://cloudresourcemanager.googleapis.com/v3", createJson.name, accessToken);
+
+    onStatus("Turning on the Gemini API for your project…");
+    var enableRes = await fetch("https://serviceusage.googleapis.com/v1/projects/" + projectId + "/services/generativelanguage.googleapis.com:enable", {
+      method: "POST", headers: authHeaders
+    });
+    var enableJson = await enableRes.json();
+    if(!enableRes.ok) throw new Error(humanizeGcpError(enableJson));
+    if(enableJson.name && !enableJson.done){
+      await pollGcpOperation("https://serviceusage.googleapis.com/v1", enableJson.name, accessToken);
+    }
+
+    onStatus("Creating your free API key…");
+    var keyRes = await fetch("https://apikeys.googleapis.com/v2/projects/" + projectId + "/locations/global/keys", {
+      method: "POST", headers: authHeaders,
+      body: JSON.stringify({ displayName: "Studyio key", restrictions: { apiTargets: [{ service: "generativelanguage.googleapis.com" }] } })
+    });
+    var keyOpJson = await keyRes.json();
+    if(!keyRes.ok) throw new Error(humanizeGcpError(keyOpJson));
+    var keyOpResult = await pollGcpOperation("https://apikeys.googleapis.com/v2", keyOpJson.name, accessToken);
+    var keyResourceName = keyOpResult.response && keyOpResult.response.name;
+    if(!keyResourceName) throw new Error("Google Cloud didn't return the new key's location.");
+
+    onStatus("Fetching your key…");
+    var getKeyRes = await fetch("https://apikeys.googleapis.com/v2/" + keyResourceName + "/keyString", {
+      headers: { Authorization: "Bearer " + accessToken }
+    });
+    var getKeyJson = await getKeyRes.json();
+    if(!getKeyRes.ok) throw new Error(humanizeGcpError(getKeyJson));
+    if(!getKeyJson.keyString) throw new Error("Google Cloud didn't return the key text.");
+    return getKeyJson.keyString;
+  }
+
+  var state = null;
+  var tab = "home";
+  var materialOpenSubject = null;
+
+  // ---------- persistence ----------
+  function normalizeState(s){
+    if(!s.subjects) s.subjects = {};
+    if(!s.materials) s.materials = [];
+    if(!s.papers) s.papers = [];
+    if(!s.results) s.results = [];
+    if(!s.model || RETIRED_MODELS.indexOf(s.model)!==-1) s.model = "gemini-3.6-flash";
+    if(!s.theme) s.theme = "chatbot";
+    if(!s._themeMigratedV1){ s.theme = "chalkboard"; s._themeMigratedV1 = true; } // one-time: new default was Chalkboard
+    if(!s._themeMigratedV2){ if(s.theme==="chalkboard") s.theme = "chatbot"; s._themeMigratedV2 = true; } // one-time: new default is Chatbot Light
+    if(THEMES.map(function(t){return t[0];}).indexOf(s.theme)===-1) s.theme = "chatbot"; // guard against a removed/unknown theme value
+    if(!s.customAccent) s.customAccent = CUSTOM_ACCENT_PRESETS[0];
+    if(!s.timetable) s.timetable = {};
+    DAYS.forEach(function(d){ if(!s.timetable[d[0]]) s.timetable[d[0]] = []; });
+    if(!s.examDates) s.examDates = {};
+    if(!s.dailyLogs) s.dailyLogs = [];
+    if(!s.studyPlan) s.studyPlan = null;
+    if(!s.chatHistory) s.chatHistory = [];
+    Object.keys(s.subjects).forEach(function(k){
+      if(!s.subjects[k].chapters) s.subjects[k].chapters = [];
+      if(!s.subjects[k].chapterStatus) s.subjects[k].chapterStatus = {};
+    });
+    return s;
+  }
+  function loadState(){
+    var raw = null; try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){}
+    var s = raw ? JSON.parse(raw) : null;
+    if(!s){
+      s = { apiKey:"", model:"gemini-3.6-flash", customModel:"", theme:"chatbot", _themeMigratedV1:true, _themeMigratedV2:true,
+        subjects:{}, materials:[], papers:[], results:[] };
+      DEFAULT_SUBJECTS.forEach(function(p){
+        s.subjects[p[0]] = { slug:p[0], name:p[1], chapters:(CHAPTER_SEED[p[0]]||[]).slice() };
+      });
+    }
+    return normalizeState(s);
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ alert("Couldn't save to this browser's storage. Your device may be low on space or in private-browsing mode."); }
+    if(!applyingRemote) pushToCloud(false);
+  }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+  // ---------- helpers ----------
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function slugify(s){ return String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"") || ("subject-"+uid()); }
+  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short"}); }catch(e){ return ""; } }
+  function el(html){ var t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+  function sortedSubjects(){ return Object.keys(state.subjects).map(function(k){return state.subjects[k];}).sort(function(a,b){return a.name.localeCompare(b.name);}); }
+  function subjectName(slug){ return state.subjects[slug] ? state.subjects[slug].name : slug; }
+  function activeModel(){ return state.model==="custom" ? (state.customModel||"gemini-2.5-flash") : state.model; }
+  function fileToBase64(file){
+    return new Promise(function(resolve,reject){
+      var r = new FileReader();
+      r.onload = function(){ resolve(String(r.result).split(",")[1]); };
+      r.onerror = reject; r.readAsDataURL(file);
+    });
+  }
+  function makeThumbnail(file){
+    return new Promise(function(resolve){
+      if(!file.type || file.type.indexOf("image/")!==0){ resolve(null); return; }
+      var img = new Image(); var url = URL.createObjectURL(file);
+      img.onload = function(){
+        var maxW=220, scale=Math.min(1,maxW/img.width);
+        var w=Math.max(1,Math.round(img.width*scale)), h=Math.max(1,Math.round(img.height*scale));
+        var c=document.createElement("canvas"); c.width=w; c.height=h;
+        c.getContext("2d").drawImage(img,0,0,w,h);
+        var dataUrl = c.toDataURL("image/jpeg",0.6);
+        URL.revokeObjectURL(url); resolve(dataUrl);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
+  // ---------- Gemini API ----------
+  async function callGemini(parts, opts){
+    opts = opts || {};
+    if(!state.apiKey){ throw {code:"no_key", message:"no key"}; }
+    var model = opts.model || activeModel();
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(state.apiKey);
+    var genConfig = {};
+    if(opts.maxOutputTokens) genConfig.maxOutputTokens = opts.maxOutputTokens;
+    if(opts.json) genConfig.responseMimeType = "application/json";
+    var body = { contents: opts.contents || [{ role:"user", parts: parts }], generationConfig: genConfig };
+    if(opts.systemInstruction) body.systemInstruction = { parts:[{text:opts.systemInstruction}] };
+    var resp;
+    try{ resp = await fetch(url, { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(body) }); }
+    catch(e){ throw {code:"network", message:String(e && e.message || e)}; }
+    var json = await resp.json().catch(function(){ return null; });
+    if(!resp.ok){
+      var msg = (json && json.error && json.error.message) || ("HTTP "+resp.status);
+      var code = (json && json.error && json.error.status) || ("http_"+resp.status);
+      throw {code:code, message:msg};
+    }
+    var cand = json && json.candidates && json.candidates[0];
+    if(!cand){ throw {code:"empty", message:"No response — the request may have been blocked."}; }
+    if(cand.finishReason==="SAFETY" || cand.finishReason==="RECITATION"){
+      throw {code:"refused", message:"Gemini declined this request (reason: "+cand.finishReason+")."};
+    }
+    var text = ((cand.content && cand.content.parts) || []).map(function(p){ return p.text||""; }).join("");
+    if(!text){ throw {code:"empty", message:"Empty response. Try again with less at once."}; }
+    return text;
+  }
+  function extractJson(text){
+    try{ return JSON.parse(text); }catch(e){}
+    var a=text.indexOf("{"), b=text.lastIndexOf("}");
+    if(a>=0 && b>a){ try{ return JSON.parse(text.slice(a,b+1)); }catch(e){} }
+    throw new Error("Couldn't read the reply as structured data.");
+  }
+  function apiErrorCopy(e){
+    if(!e) return "Something went wrong. Try again.";
+    if(e.code==="no_key") return "Add your free Gemini API key in Settings first.";
+    if(e.code==="network") return "Couldn't reach Google's servers — check your internet connection.";
+    if(e.code==="UNAUTHENTICATED" || e.code==="PERMISSION_DENIED" || e.code==="http_401" || e.code==="http_403") return "That API key was rejected. Double-check it in Settings.";
+    if(e.code==="RESOURCE_EXHAUSTED" || e.code==="http_429") return "You've hit the free tier's rate limit for now — wait a bit and try again.";
+    if(e.code==="refused") return e.message;
+    if(e.code==="empty") return e.message || "No answer came back. Try again.";
+    return "Something went wrong (" + (e.message||"unknown") + "). Try again.";
+  }
+
+  // ---------- shell ----------
+  function render(){
+    document.documentElement.setAttribute("data-theme", state.theme);
+    if(state.theme==="custom") applyCustomAccent(state.customAccent || CUSTOM_ACCENT_PRESETS[0]);
+    else clearCustomAccentOverride();
+    document.querySelectorAll(".navbtn").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")===tab); });
+    var main = document.getElementById("main");
+    main.innerHTML = "";
+    if(!state.apiKey && tab!=="settings" && tab!=="home"){
+      main.appendChild(el('<div class="notice">Add your free Gemini API key in <b>Settings</b> before generating or checking papers. Everything else works without it.</div>'));
+    }
+    if(tab==="home") renderHome(main);
+    else if(tab==="papers") renderPapers(main);
+    else if(tab==="material") renderMaterial(main);
+    else if(tab==="analysis") renderAnalysis(main);
+    else if(tab==="planner") renderPlanner(main);
+    else if(tab==="settings") renderSettings(main);
+  }
+  function openDrawer(){ document.getElementById("drawer").classList.add("open"); document.getElementById("drawer-backdrop").classList.add("open"); }
+  function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("drawer-backdrop").classList.remove("open"); }
+  document.getElementById("hamburger-btn").addEventListener("click", openDrawer);
+  document.getElementById("nav-close-btn").addEventListener("click", closeDrawer);
+  document.getElementById("drawer-backdrop").addEventListener("click", closeDrawer);
+  document.querySelectorAll(".navbtn").forEach(function(b){
+    b.addEventListener("click", function(){ tab = b.getAttribute("data-tab"); render(); closeDrawer(); });
+  });
+
+  // ================= HOME =================
+  var homeQuoteOfSession = null; // pick once per app load, not on every re-render
+  function renderHome(main){
+    if(homeQuoteOfSession===null) homeQuoteOfSession = HOME_QUOTES[Math.floor(Math.random()*HOME_QUOTES.length)];
+    var hour = new Date().getHours();
+    var greeting = (hour<5 || hour>=21) ? "Still up?" : hour<12 ? "Good morning" : hour<17 ? "Good afternoon" : "Good evening";
+    main.appendChild(el(
+      '<div class="home-hero">'+
+        '<div class="home-greeting">'+esc(greeting)+'.</div>'+
+        '<div class="home-quote">&ldquo;'+esc(homeQuoteOfSession)+'&rdquo;</div>'+
+      '</div>'
+    ));
+
+    // ---- chat panel ----
+    var chatPanel = el(
+      '<div class="panel chat-panel">'+
+        '<div class="chat-panel-head"><h3 class="section-h" style="margin-bottom:0;">Ask a study question</h3>'+
+        (state.chatHistory.length ? '<button type="button" class="linkbtn" id="chat-clear-btn">Clear chat</button>' : '')+
+        '</div>'+
+        '<p style="color:var(--ink-soft);font-size:12.5px;margin-top:2px;margin-bottom:10px;">Answers use your uploaded Material when it\'s relevant, plus general ICSE Class 9 knowledge otherwise.</p>'+
+        '<div class="chat-messages" id="chat-messages"></div>'+
+        '<div class="chat-input-row">'+
+          '<textarea id="chat-input" placeholder="e.g. Explain photosynthesis in simple terms" rows="1"></textarea>'+
+          '<button class="btn" id="chat-send-btn">Send</button>'+
+        '</div>'+
+        '<div id="chat-error"></div>'+
+      '</div>'
+    );
+    main.appendChild(chatPanel);
+
+    function renderMessages(){
+      var list = document.getElementById("chat-messages");
+      list.innerHTML = state.chatHistory.map(function(m){
+        return '<div class="chat-msg '+(m.role==="user"?"user":"assistant")+(m.thinking?" thinking":"")+'">'+esc(m.text)+'</div>';
+      }).join("");
+      list.scrollTop = list.scrollHeight;
+    }
+    renderMessages();
+
+    var inputEl = document.getElementById("chat-input");
+    var sendBtn = document.getElementById("chat-send-btn");
+    var errBox = document.getElementById("chat-error");
+
+    async function sendChat(){
+      var text = inputEl.value.trim();
+      if(!text) return;
+      if(!state.apiKey){
+        errBox.innerHTML = ""; errBox.appendChild(el('<div class="notice err">Add your free Gemini API key in Settings first.</div>'));
+        return;
+      }
+      errBox.innerHTML = "";
+      inputEl.value = ""; inputEl.style.height = "auto";
+      state.chatHistory.push({ role:"user", text:text });
+      state.chatHistory.push({ role:"assistant", text:"Thinking…", thinking:true });
+      saveState(); renderMessages();
+      sendBtn.disabled = true; inputEl.disabled = true;
+      try{
+        var systemText =
+          "You are a friendly, encouraging study assistant inside \"Studyio\", an ICSE Class 9 exam-prep app. "+
+          "Answer the student's question clearly and simply, the way a good teacher would — concise unless they ask for more detail. "+
+          "Below are short summaries of the student's own uploaded material. Use them only if actually relevant to the question; "+
+          "otherwise just answer from general ICSE Class 9 knowledge. Never say you don't have access to their material — "+
+          "if nothing relevant is below, simply answer generally.\n\nUploaded material summaries:\n\n" +
+          (materialsSummaryAllSubjects() || "(nothing uploaded yet)");
+        var history = state.chatHistory.filter(function(m){ return !m.thinking; });
+        var contents = history.map(function(m){ return { role: m.role==="assistant" ? "model" : "user", parts:[{text:m.text}] }; });
+        var reply = await callGemini(null, { contents: contents, systemInstruction: systemText, maxOutputTokens: 900 });
+        state.chatHistory.pop(); // remove "Thinking…"
+        state.chatHistory.push({ role:"assistant", text: reply.trim() });
+      }catch(e){
+        state.chatHistory.pop(); // remove "Thinking…"
+        errBox.innerHTML = ""; errBox.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }
+      saveState(); renderMessages();
+      sendBtn.disabled = false; inputEl.disabled = false; inputEl.focus();
+    }
+    sendBtn.addEventListener("click", sendChat);
+    inputEl.addEventListener("keydown", function(e){
+      if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendChat(); }
+    });
+    inputEl.addEventListener("input", function(){
+      this.style.height = "auto"; this.style.height = Math.min(this.scrollHeight, 120) + "px";
+    });
+    var clearBtn = document.getElementById("chat-clear-btn");
+    if(clearBtn) clearBtn.addEventListener("click", function(){
+      if(!confirm("Clear this whole chat? This can't be undone.")) return;
+      state.chatHistory = []; saveState(); render();
+    });
+
+    // ---- quick links ----
+    var tiles = [
+      { icon:"📝", title:"Create a paper", desc:"Build a fresh practice paper for any subject.", tab:"papers" },
+      { icon:"✅", title:"Check my last paper", desc:"Get ICSE-style marking and practical pointers.", tab:"analysis" },
+      { icon:"📅", title:"Today's plan", desc:"See your timetable and check in on today.", tab:"planner" },
+      { icon:"📚", title:"Upload material", desc:"Add notes, past papers or mock papers.", tab:"material" }
+    ];
+    var grid = el('<div class="home-grid"></div>');
+    tiles.forEach(function(t){
+      var card = el(
+        '<button type="button" class="home-tile">'+
+          '<div class="home-tile-icon">'+t.icon+'</div>'+
+          '<div class="home-tile-title">'+esc(t.title)+'</div>'+
+          '<div class="home-tile-desc">'+esc(t.desc)+'</div>'+
+        '</button>'
+      );
+      card.addEventListener("click", function(){ tab = t.tab; render(); });
+      grid.appendChild(card);
+    });
+    main.appendChild(grid);
+    var totalSubjects = Object.keys(state.subjects).length;
+    var totalPapers = state.papers.length;
+    var totalChecked = state.results.length;
+    main.appendChild(el(
+      '<div class="home-snapshot">'+totalSubjects+' subject'+(totalSubjects===1?"":"s")+' tracked &middot; '+
+      totalPapers+' paper'+(totalPapers===1?"":"s")+' created &middot; '+totalChecked+' checked so far</div>'
+    ));
+  }
+
+  // ================= PAPERS =================
+  function renderPapers(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Papers</div><h2>Create a paper</h2>'+
+      '<p>Matches your school’s format using everything you’ve uploaded in Material, and skips whatever you mark as omitted.</p></div>'
+    ));
+    var panel = el('<div class="panel"></div>');
+    var subj0 = sortedSubjects()[0] ? sortedSubjects()[0].slug : "";
+    panel.innerHTML =
+      '<div class="field"><label for="p-subject">Subject</label><select id="p-subject">'+
+        sortedSubjects().map(function(s){ return '<option value="'+esc(s.slug)+'">'+esc(s.name)+'</option>'; }).join("")+
+      '</select></div>'+
+      '<div class="field"><label>Chapters (pick at least one)</label>'+
+      '<div class="chaptools"><button type="button" class="linkbtn" id="p-chap-all">Select all</button><button type="button" class="linkbtn" id="p-chap-none">Clear</button></div>'+
+      '<div class="chapters-box" id="p-chapters"></div></div>'+
+      '<div class="row">'+
+        '<div class="field"><label for="p-marks">Marks (enter manually)</label><input id="p-marks" type="number" value="40" min="5" step="5"></div>'+
+        '<div class="field"><label for="p-time">Time (minutes)</label><input id="p-time" type="number" value="60" min="15" step="5"></div>'+
+      '</div>'+
+      '<div class="field"><label>Difficulty</label><div class="diff-row" id="p-difficulty"></div></div>'+
+      '<div class="field"><label for="p-omit">Extra points / omissions</label>'+
+      '<textarea id="p-omit" placeholder="e.g. Omit the last two headings of Chapter 4. Focus extra on Trigonometry."></textarea>'+
+      '<div class="uploadbox" id="p-omit-uploadbox" style="margin-top:8px;">Or upload your teacher’s omission list / textbook page (photo, PDF, Word, txt) — it’ll be read and added above</div>'+
+      '<input type="file" id="p-omit-file" accept="*/*" style="display:none">'+
+      '<div id="p-omit-status"></div></div>'+
+      '<button class="btn" id="gen-btn">Generate practice paper</button>'+
+      '<div id="gen-status"></div><div id="gen-output"></div>';
+    main.appendChild(panel);
+
+    function renderChapterChips(){
+      var slug = document.getElementById("p-subject").value;
+      var chapters = (state.subjects[slug] && state.subjects[slug].chapters) || [];
+      var box = document.getElementById("p-chapters");
+      if(chapters.length===0){
+        box.innerHTML = '<span style="font-size:13px;color:var(--ink-soft)">No chapters listed yet for this subject — add some in Material.</span>';
+        return;
+      }
+      // Grouped by Planner status instead of one flat wall of chips, so you
+      // don't have to scan every chapter in the subject at once — pending/
+      // covered chapters (the ones you actually need for a fresh paper) open
+      // by default, revised/mastered ones tucked away but still one tap open.
+      var groups = CHAPTER_STATUSES.map(function(st){ return { key:st[0], label:st[1], chapters:[] }; });
+      chapters.forEach(function(c){
+        var st = chapterStatus(slug, c);
+        var g = groups.filter(function(g){ return g.key===st; })[0] || groups[0];
+        g.chapters.push(c);
+      });
+      box.innerHTML = groups.filter(function(g){ return g.chapters.length; }).map(function(g){
+        var openAttr = (g.key==="pending" || g.key==="covered") ? " open" : "";
+        return '<details class="chapter-group"'+openAttr+'>'+
+          '<summary>'+esc(g.label)+'<span class="chapter-group-count">'+g.chapters.length+'</span></summary>'+
+          '<div class="chapter-group-body">'+
+            g.chapters.map(function(c){
+              return '<label class="chapter-chip checked"><input type="checkbox" checked value="'+esc(c)+'">'+
+                '<span class="chip-dot chip-dot-'+g.key+'"></span><span>'+esc(c)+'</span></label>';
+            }).join("")+
+          '</div>'+
+        '</details>';
+      }).join("");
+      box.querySelectorAll(".chapter-chip").forEach(function(chip){
+        chip.addEventListener("click", function(){
+          setTimeout(function(){ chip.classList.toggle("checked", chip.querySelector("input").checked); }, 0);
+        });
+      });
+    }
+    document.getElementById("p-subject").addEventListener("change", renderChapterChips);
+    renderChapterChips();
+    document.getElementById("p-chap-all").addEventListener("click", function(){
+      document.querySelectorAll("#p-chapters input").forEach(function(cb){ cb.checked=true; cb.closest(".chapter-chip").classList.add("checked"); });
+    });
+    document.getElementById("p-chap-none").addEventListener("click", function(){
+      document.querySelectorAll("#p-chapters input").forEach(function(cb){ cb.checked=false; cb.closest(".chapter-chip").classList.remove("checked"); });
+    });
+
+    var diffBox = document.getElementById("p-difficulty");
+    diffBox.innerHTML = DIFFICULTIES.map(function(d,i){
+      return '<label class="diff-opt'+(i===2?" checked":"")+'"><input type="radio" name="p-diff" value="'+d[0]+'"'+(i===2?" checked":"")+'>'+esc(d[1])+'<br><span style="font-weight:400;font-size:11px;">'+esc(d[2])+'</span></label>';
+    }).join("");
+    diffBox.querySelectorAll(".diff-opt").forEach(function(opt){
+      opt.addEventListener("click", function(){
+        diffBox.querySelectorAll(".diff-opt").forEach(function(o){ o.classList.remove("checked"); });
+        opt.classList.add("checked");
+      });
+    });
+
+    document.getElementById("p-omit-uploadbox").addEventListener("click", function(){ document.getElementById("p-omit-file").click(); });
+    document.getElementById("p-omit-file").addEventListener("change", async function(){
+      var file = this.files[0]; if(!file) return;
+      var status = document.getElementById("p-omit-status");
+      status.innerHTML = ""; status.appendChild(el('<div class="empty thinking" style="padding:6px 0;">Reading '+esc(file.name)+'&hellip;</div>'));
+      var sName = subjectName(document.getElementById("p-subject").value);
+      try{
+        var extracted = await analyzeOmissionFile(file, sName);
+        var ta = document.getElementById("p-omit");
+        ta.value = (ta.value ? ta.value + "\n\n" : "") + "[From "+file.name+"]\n" + extracted;
+        status.innerHTML = "";
+        status.appendChild(el('<div class="notice ok">Read and added below — edit if needed.</div>'));
+      }catch(e){
+        status.innerHTML = "";
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }
+    });
+
+    document.getElementById("gen-btn").addEventListener("click", async function(){
+      var btn = this;
+      var subjectSlug = document.getElementById("p-subject").value;
+      var sName = subjectName(subjectSlug);
+      var chapters = Array.from(document.querySelectorAll("#p-chapters input:checked")).map(function(cb){ return cb.value; });
+      var marksTotal = parseInt(document.getElementById("p-marks").value,10) || 40;
+      var timeMinutes = parseInt(document.getElementById("p-time").value,10) || 60;
+      var diffRadio = diffBox.querySelector("input:checked");
+      var diffNum = diffRadio ? diffRadio.value : "3";
+      var diffInfo = DIFFICULTIES.find(function(d){ return String(d[0])===String(diffNum); }) || DIFFICULTIES[2];
+      var omit = document.getElementById("p-omit").value.trim();
+      var status = document.getElementById("gen-status"), out = document.getElementById("gen-output");
+      status.innerHTML=""; out.innerHTML="";
+      if(chapters.length===0){ status.appendChild(el('<div class="notice err">Select at least one chapter.</div>')); return; }
+      btn.disabled = true;
+
+      var sheet = el(
+        '<div class="paper-sheet"><div class="head"><div class="subj">'+esc(sName)+'</div>'+
+        '<div class="meta"><span>Total marks: '+marksTotal+'</span><span>Time: '+timeMinutes+' min</span><span>Difficulty: '+esc(diffInfo[1])+'</span></div></div>'+
+        '<pre class="thinking">Thinking&hellip; this can take up to a minute.</pre></div>'
+      );
+      out.appendChild(sheet);
+
+      var patternNotes = materialsSummaryFor(subjectSlug);
+      var prompt =
+        "You are helping an ICSE (Indian Certificate of Secondary Education) Class 9 student prepare for a school exam in "+sName+".\n\n"+
+        "What this student's own uploaded past papers and materials for this subject show (use this to match the real format and predict likely questions; if it says none, use standard ICSE Class 9 conventions):\n"+
+        (patternNotes || "(nothing uploaded yet for this subject — use standard ICSE Class 9 exam conventions)")+
+        "\n\nTask: write ONE complete practice exam paper.\n"+
+        "Chapters to cover (ONLY these; do not include questions from any other chapter): "+chapters.join(", ")+"\n"+
+        "Total marks: "+marksTotal+". Time allowed: "+timeMinutes+" minutes.\n"+
+        "Difficulty level: "+diffInfo[1]+" ("+diffInfo[2]+"). Calibrate every question to this level.\n"+
+        (omit ? ("Extra instructions from the student (follow precisely — this may list topics to omit and/or extra focus areas):\n"+omit+"\n") : "")+
+        "\nFormat it exactly like a real ICSE question paper:\n"+
+        "- A short header instruction line such as \"Answers to this Paper must be written on the paper provided separately.\"\n"+
+        "- Organise into sections the way this school actually structures papers if shown above; otherwise use the standard ICSE structure for this subject.\n"+
+        "- Number every question and put its marks in square brackets at the right, e.g. [2]\n"+
+        "- Use authentic ICSE command-word phrasing (State, Explain briefly, Give a reason for, Differentiate between, Derive, With the help of a labelled diagram…).\n"+
+        "- Where a question closely matches something the student's uploaded materials show, add \" (predicted — similar to a question you've seen before)\" right after that question, same line.\n"+
+        "- Never include a question from an omitted topic. Cover the chosen chapters thoroughly and realistically; no trivial filler.\n\n"+
+        "Output plain text only — no markdown headers, no asterisks.";
+
+      try{
+        var text = await callGemini([{text:prompt}], { maxOutputTokens:4000 });
+        var pre = sheet.querySelector("pre");
+        pre.classList.remove("thinking"); pre.textContent = text;
+        state.papers.unshift({ id:uid(), subjectSlug:subjectSlug, subjectName:sName, chapters:chapters,
+          marksTotal:marksTotal, timeMinutes:timeMinutes, difficulty:diffInfo[1], omissions:omit,
+          content:text, createdAt:new Date().toISOString() });
+        saveState();
+        renderRecentPapers(main);
+      }catch(e){
+        sheet.remove();
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }finally{ btn.disabled = false; }
+    });
+
+    renderRecentPapers(main);
+  }
+
+  async function analyzeOmissionFile(file, sName){
+    var basePrompt = "This file is a teacher's exam omission/extra-focus note or a textbook page for an ICSE Class 9 student, subject: "+sName+". "+
+      "Identify exactly which chapters, headings or sections are marked as OMITTED (not to be tested), and any marked as EXTRA FOCUS. "+
+      "Output short plain-text dash-prefixed lines only, e.g. '- Omit: <heading>' or '- Extra focus: <topic>'. No other commentary.";
+    var lowerName = file.name.toLowerCase();
+    if(file.type === "application/pdf"){
+      var b64 = await fileToBase64(file);
+      return callGemini([{inline_data:{mime_type:"application/pdf", data:b64}}, {text:basePrompt}], { maxOutputTokens:800 });
+    }else if(file.type.indexOf("image/")===0){
+      var b64i = await fileToBase64(file);
+      return callGemini([{inline_data:{mime_type:file.type, data:b64i}}, {text:basePrompt}], { maxOutputTokens:800 });
+    }else if(lowerName.endsWith(".docx")){
+      var buf = await file.arrayBuffer();
+      var result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+      var docText = (result.value||"").trim().slice(0,20000);
+      if(!docText) throw new Error("Couldn't find any text in that Word document.");
+      return callGemini([{text: basePrompt + "\n\nExtracted text:\n\n" + docText}], { maxOutputTokens:800 });
+    }else if(lowerName.endsWith(".txt") || file.type==="text/plain"){
+      var raw = (await file.text()).slice(0,20000);
+      return callGemini([{text: basePrompt + "\n\nText:\n\n" + raw}], { maxOutputTokens:800 });
+    }
+    throw new Error("Unsupported file type. Use a PDF, photo, .docx or .txt file.");
+  }
+
+  function materialsSummaryFor(slug){
+    var items = state.materials.filter(function(m){ return m.subjectSlug===slug && m.status==="done" && m.summary; })
+      .sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); })
+      .slice(0, 25);
+    return items.map(function(m){ return "["+(m.kind==="mock"?"Mock paper":"Material")+": "+m.fileName+"]\n"+m.summary; }).join("\n\n").slice(0,8000);
+  }
+  // Condensed, capped-length summary across every subject's uploaded material,
+  // for the Home chat assistant (which isn't scoped to one subject).
+  function materialsSummaryAllSubjects(){
+    var chunks = [];
+    Object.keys(state.subjects).forEach(function(slug){
+      var s = materialsSummaryFor(slug);
+      if(s) chunks.push("Subject: " + state.subjects[slug].name + "\n" + s.slice(0,1200));
+    });
+    return chunks.join("\n\n").slice(0,7000);
+  }
+
+  function renderRecentPapers(main){
+    var old = main.querySelector("#recent-papers"); if(old) old.remove();
+    var ps = state.papers.slice(0,8);
+    var wrap = el('<div class="panel" id="recent-papers"><h3 class="section-h">Recent papers</h3></div>');
+    if(ps.length===0){ wrap.appendChild(el('<div class="empty">Nothing generated yet.</div>')); }
+    else{
+      ps.forEach(function(p){
+        wrap.appendChild(el(
+          '<div class="qrow"><div class="qbody"><div class="qno">'+esc(fmtDate(p.createdAt))+' · '+esc(p.subjectName)+'</div>'+
+          '<div class="pointer">'+esc(p.marksTotal)+' marks · '+esc(p.difficulty||"")+' · '+esc((p.chapters||[]).join(", ").slice(0,70))+'</div></div></div>'
+        ));
+      });
+    }
+    main.appendChild(wrap);
+  }
+
+  // ================= MATERIAL =================
+  function renderMaterial(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Material</div><h2>What Studyio has learned</h2>'+
+      '<p>Pick a subject, then upload study material or full mock papers — PDF, Word, photo, or text. Each one gets read, analyzed, and remembered for every paper generated after.</p></div>'
+    ));
+    if(materialOpenSubject && state.subjects[materialOpenSubject]){
+      renderMaterialSubject(main, materialOpenSubject);
+      return;
+    }
+    var grid = el('<div class="grid"></div>');
+    sortedSubjects().forEach(function(s){
+      var mats = state.materials.filter(function(m){ return m.subjectSlug===s.slug && m.kind!=="mock"; });
+      var mocks = state.materials.filter(function(m){ return m.subjectSlug===s.slug && m.kind==="mock"; });
+      var card = el(
+        '<button class="card" data-slug="'+esc(s.slug)+'"><h3>'+esc(s.name)+'</h3>'+
+        '<div class="meta"><span><b class="mono">'+mats.length+'</b> materials</span><span><b class="mono">'+mocks.length+'</b> mock papers</span></div>'+
+        '<div class="meta"><span><b class="mono">'+(s.chapters||[]).length+'</b> chapters listed</span></div></button>'
+      );
+      card.addEventListener("click", function(){ materialOpenSubject = s.slug; render(); });
+      grid.appendChild(card);
+    });
+    main.appendChild(grid);
+  }
+
+  function renderMaterialSubject(main, slug){
+    var s = state.subjects[slug];
+    var back = el('<button class="backlink">&larr; All subjects</button>');
+    back.addEventListener("click", function(){ materialOpenSubject = null; render(); });
+    main.appendChild(back);
+    main.appendChild(el('<div class="page-head" style="margin-bottom:16px;"><h2>'+esc(s.name)+'</h2></div>'));
+
+    // chapters editor
+    var chPanel = el(
+      '<div class="panel"><h3 class="section-h">Chapters</h3>'+
+      '<div class="chapters-box" id="m-chapters">'+
+        (s.chapters||[]).map(function(c,i){ return '<span class="chapter-chip checked" data-i="'+i+'"><span class="chap-text" data-i="'+i+'" title="Click to rename" style="cursor:text;">'+esc(c)+'</span> <button type="button" class="linkbtn rm-chapter" data-i="'+i+'" style="margin-left:2px;">&times;</button></span>'; }).join("")+
+      '</div>'+
+      (s.chapters && s.chapters.length ? '<p style="color:var(--ink-soft);font-size:12px;margin:-2px 0 10px;">Click a chapter’s name to rename it.</p>' : '')+
+      '<div class="row" style="align-items:flex-end;margin-top:8px;">'+
+        '<div class="field" style="margin-bottom:0;"><input type="text" id="m-newchapter" placeholder="Add a chapter name"></div>'+
+        '<button class="btn small" id="m-addchapter">Add</button>'+
+      '</div></div>'
+    );
+    main.appendChild(chPanel);
+    chPanel.querySelectorAll(".rm-chapter").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var i = parseInt(btn.getAttribute("data-i"),10);
+        s.chapters.splice(i,1); saveState(); render();
+      });
+    });
+    chPanel.querySelectorAll(".chap-text").forEach(function(span){
+      span.addEventListener("click", function(){
+        var i = parseInt(span.getAttribute("data-i"),10);
+        var input = document.createElement("input");
+        input.type = "text"; input.value = s.chapters[i];
+        input.style.cssText = "font-size:13px;padding:2px 6px;border:1px solid var(--focus);border-radius:4px;width:"+Math.max(80,s.chapters[i].length*7)+"px;background:var(--surface);color:var(--ink);";
+        span.replaceWith(input);
+        input.focus(); input.select();
+        var done = false;
+        function commit(){
+          if(done) return; done = true;
+          var v = input.value.trim();
+          if(v) s.chapters[i] = v;
+          saveState(); render();
+        }
+        input.addEventListener("blur", commit);
+        input.addEventListener("keydown", function(ev){
+          if(ev.key==="Enter"){ ev.preventDefault(); commit(); }
+          else if(ev.key==="Escape"){ ev.preventDefault(); if(!done){ done=true; render(); } }
+        });
+      });
+    });
+    document.getElementById("m-addchapter").addEventListener("click", function(){
+      var input = document.getElementById("m-newchapter");
+      var v = input.value.trim(); if(!v) return;
+      s.chapters.push(v); saveState(); render();
+    });
+
+    main.appendChild(uploadSection(slug, "material", "Study materials", "Notes, textbook excerpts, syllabus, teacher handouts…"));
+    main.appendChild(uploadSection(slug, "mock", "Mock papers", "Full past tests or mock exams — upload as many as you have."));
+  }
+
+  function uploadSection(slug, kind, title, subtitle){
+    var items = state.materials.filter(function(m){ return m.subjectSlug===slug && m.kind===kind; })
+      .sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+    var panel = el(
+      '<div class="panel"><h3 class="section-h">'+esc(title)+'</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13px;margin-top:-6px;margin-bottom:12px;">'+esc(subtitle)+'</p>'+
+      '<div class="uploadbox" data-kind="'+kind+'">Click to upload (PDF, Word, photo, or text file)</div>'+
+      '<input type="file" accept="*/*" style="display:none" data-kind="'+kind+'">'+
+      '<div class="mat-list" style="margin-top:14px;">'+
+        (items.length ? items.map(materialRowHtml).join("") : '<div class="empty" style="padding:8px 0;">Nothing uploaded yet.</div>')+
+      '</div></div>'
+    );
+    var box = panel.querySelector(".uploadbox"); var input = panel.querySelector('input[type=file]');
+    box.addEventListener("click", function(){ input.click(); });
+    input.addEventListener("change", function(){ handleMaterialUpload(input, slug, kind); });
+    panel.querySelectorAll(".rm-material").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(!confirm("Remove this file? This can't be undone.")) return;
+        var id = btn.getAttribute("data-id");
+        state.materials = state.materials.filter(function(m){ return m.id!==id; });
+        saveState(); render();
+      });
+    });
+    panel.querySelectorAll(".toggle-excerpt").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var row = btn.closest(".material-item");
+        var ex = row.querySelector(".excerpt");
+        ex.hidden = !ex.hidden;
+        btn.textContent = ex.hidden ? "Show what it found" : "Hide";
+      });
+    });
+    return panel;
+  }
+
+  function materialRowHtml(m){
+    var badge = m.status==="done" ? '<span class="status-badge done">Read &amp; analyzed</span>'
+      : m.status==="failed" ? '<span class="status-badge failed">Couldn’t read this</span>'
+      : '<span class="status-badge pending">Reading&hellip;</span>';
+    var thumb = m.thumb ? '<img class="thumb" src="'+m.thumb+'">' : '<div class="thumb icon">'+esc((m.fileType||"file").split("/").pop().slice(0,4))+'</div>';
+    return '<div class="material-item" data-id="'+esc(m.id)+'">'+thumb+
+      '<div class="mbody"><div class="row1"><span class="fname">'+esc(m.fileName)+'</span>'+badge+'</div>'+
+      (m.summary ? '<button type="button" class="linkbtn toggle-excerpt">Show what it found</button><div class="excerpt" hidden>'+esc(m.summary)+'</div>' : '')+
+      '<div class="rowbtns"><button type="button" class="linkbtn rm-material" data-id="'+esc(m.id)+'">Remove</button></div></div></div>';
+  }
+
+  async function handleMaterialUpload(input, slug, kind){
+    var file = input.files[0]; if(!file) return;
+    var thumb = await makeThumbnail(file);
+    var mat = { id:uid(), subjectSlug:slug, kind:kind, fileName:file.name, fileType:file.type||"file",
+      status:"pending", summary:"", thumb:thumb, createdAt:new Date().toISOString() };
+    state.materials.unshift(mat); saveState(); render();
+
+    var sName = subjectName(slug);
+    var basePrompt = "This is "+(kind==="mock" ? "a full past mock exam/test paper" : "study material")+" for an ICSE Class 9 student, subject: "+sName+". "+
+      "Extract concise plain-text notes for future reference: section structure and mark distribution (if it's a paper), exact phrasing and command words used, topics/questions/content covered, and any marking-scheme hints visible. "+
+      "Output 5-10 short dash-prefixed lines, plain text only, no other commentary.";
+    try{
+      var text;
+      var lowerName = file.name.toLowerCase();
+      if(file.type === "application/pdf"){
+        var b64 = await fileToBase64(file);
+        text = await callGemini([{inline_data:{mime_type:"application/pdf", data:b64}}, {text:basePrompt}], { maxOutputTokens:1200 });
+      }else if(file.type.indexOf("image/")===0){
+        var b64i = await fileToBase64(file);
+        text = await callGemini([{inline_data:{mime_type:file.type, data:b64i}}, {text:basePrompt}], { maxOutputTokens:1200 });
+      }else if(lowerName.endsWith(".docx")){
+        var buf = await file.arrayBuffer();
+        var result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+        var docText = (result.value||"").trim().slice(0,20000);
+        if(!docText) throw new Error("Couldn't find any text in that Word document.");
+        text = await callGemini([{text: basePrompt + "\n\nExtracted text:\n\n" + docText}], { maxOutputTokens:1200 });
+      }else if(lowerName.endsWith(".txt") || file.type==="text/plain"){
+        var raw = (await file.text()).slice(0,20000);
+        text = await callGemini([{text: basePrompt + "\n\nText:\n\n" + raw}], { maxOutputTokens:1200 });
+      }else{
+        throw new Error("Unsupported file type here — use a PDF, photo (jpg/png), .docx or .txt file.");
+      }
+      mat.status = "done"; mat.summary = text;
+    }catch(e){
+      mat.status = "failed"; mat.summary = e && e.code ? apiErrorCopy(e) : (e.message || String(e));
+    }
+    saveState();
+    if(tab==="material") render();
+  }
+
+  // ================= ANALYSIS =================
+  function renderAnalysis(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Analysis</div><h2>Check your paper &amp; track progress</h2>'+
+      '<p>Get marked like a real ICSE script, with pointers you can actually act on — then watch your scores move over time.</p></div>'
+    ));
+    renderCheckPanel(main);
+    var progressPanel = el('<div><h3 class="section-h">Your progress</h3></div>');
+    main.appendChild(progressPanel);
+    renderProgressChart(progressPanel);
+  }
+
+  function renderCheckPanel(main){
+    var panel = el('<div class="panel"><h3 class="section-h">Check your paper</h3></div>');
+    var firstSlug = sortedSubjects()[0] ? sortedSubjects()[0].slug : "";
+    panel.innerHTML +=
+      '<div class="row">'+
+        '<div class="field"><label for="chk-subject">Subject</label><select id="chk-subject">'+
+          sortedSubjects().map(function(s){ return '<option value="'+esc(s.slug)+'">'+esc(s.name)+'</option>'; }).join("")+
+        '</select></div>'+
+        '<div class="field"><label for="chk-paper">Which paper (optional)</label><select id="chk-paper"></select></div>'+
+      '</div>'+
+      '<div class="field"><label for="chk-answers">Your answers (type them, question by question)</label>'+
+      '<textarea id="chk-answers" placeholder="1(a) ...\n1(b) ...\n2 ..." style="min-height:150px"></textarea></div>'+
+      '<div class="field"><label>Or attach photos / a PDF of your answer script (multiple pages allowed)</label>'+
+      '<div class="uploadbox" id="chk-uploadbox">Click to choose file(s)</div>'+
+      '<input type="file" id="chk-file" accept="image/*,application/pdf" multiple style="display:none">'+
+      '<div id="chk-filename" style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;"></div></div>'+
+      '<button class="btn" id="chk-btn">Check my answers</button>'+
+      '<div id="chk-status"></div><div id="chk-output"></div>';
+    main.appendChild(panel);
+
+    var subjectSel = panel.querySelector("#chk-subject");
+    var paperSel = panel.querySelector("#chk-paper");
+    function refreshPapers(){
+      var ps = state.papers.filter(function(p){ return p.subjectSlug===subjectSel.value; })
+        .sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+      paperSel.innerHTML = '<option value="">Not from this app / external test</option>' + ps.map(function(p){
+        return '<option value="'+esc(p.id)+'">'+esc(fmtDate(p.createdAt))+' &middot; '+esc(p.marksTotal)+' marks'+(p.chapters&&p.chapters.length?" — "+esc(p.chapters.join(", ").slice(0,40)):"")+'</option>';
+      }).join("");
+    }
+    refreshPapers();
+    subjectSel.addEventListener("change", refreshPapers);
+
+    var chosenFiles = [];
+    panel.querySelector("#chk-uploadbox").addEventListener("click", function(){ panel.querySelector("#chk-file").click(); });
+    panel.querySelector("#chk-file").addEventListener("change", function(){
+      chosenFiles = Array.from(this.files || []);
+      panel.querySelector("#chk-filename").textContent = chosenFiles.length ? ("Attached: "+chosenFiles.map(function(f){return f.name;}).join(", ")) : "";
+    });
+
+    panel.querySelector("#chk-btn").addEventListener("click", async function(){
+      var btn = this;
+      var slug = subjectSel.value, sName = subjectName(slug);
+      var paper = state.papers.find(function(p){ return p.id===paperSel.value; });
+      var answersText = panel.querySelector("#chk-answers").value.trim();
+      var status = panel.querySelector("#chk-status"), out = panel.querySelector("#chk-output");
+      status.innerHTML=""; out.innerHTML="";
+      if(!answersText && chosenFiles.length===0){ status.appendChild(el('<div class="notice err">Type your answers or attach a file first.</div>')); return; }
+      btn.disabled = true;
+      out.appendChild(el('<div class="empty thinking">Marking your script&hellip; this can take a minute.</div>'));
+
+      var promptText =
+        "You are grading an ICSE Class 9 student's answers the way a real ICSE examiner would: award marks for correct keywords, working/steps and structure, not just right/wrong; deduct for missing units, unlabelled diagrams, skipped working, or answers longer/shorter than their mark value deserves.\n\n"+
+        "SUBJECT: "+sName+"\n\nTHE PAPER"+(paper?"":" (none selected — if the attached file(s) contain the questions too, grade from those; otherwise grade the answers generally)")+":\n"+(paper?paper.content:"(not provided)")+"\n\n"+
+        "THE STUDENT'S ANSWERS"+(chosenFiles.length?" (also see the attached file(s), possibly multiple pages of one script)":"")+":\n"+(answersText||"(see attached file(s))")+"\n\n"+
+        "Reply with ONLY a JSON object, this exact shape, no other text:\n"+
+        '{"totalScore": number, "maxScore": number, "questions": [{"qNo": "1(a)", "max": 2, "awarded": 1.5, "pointer": "one specific, practical sentence on exactly what to change to earn full marks"}], "generalPointers": ["2-4 specific, practical sentences"], "practicalAdvice": ["2-4 sentences of concrete, applicable exam-technique advice — never generic advice like ‘study more’ or ‘practice regularly’; say exactly what habit or technique to change"]}\n'+
+        "Be honest and specific, never generically encouraging, and never vague (\"study more\", \"revise better\" are not acceptable pointers — always say exactly what to do differently). Base marks strictly on ICSE Class 9 marking-scheme conventions.";
+
+      try{
+        var parts = [];
+        for(var i=0;i<chosenFiles.length;i++){
+          var f = chosenFiles[i];
+          var b64 = await fileToBase64(f);
+          parts.push({ inline_data:{ mime_type: f.type || "application/pdf", data:b64 } });
+        }
+        parts.push({ text: promptText });
+        var text = await callGemini(parts, { maxOutputTokens:4000, json:true });
+        var data = extractJson(text);
+        out.innerHTML = "";
+        renderResult(out, data);
+        state.results.unshift({ id:uid(), paperId: paper?paper.id:null, subjectSlug:slug, subjectName:sName,
+          totalScore:data.totalScore, maxScore:data.maxScore, questions:data.questions||[],
+          generalPointers:data.generalPointers||[], practicalAdvice:data.practicalAdvice||[], createdAt:new Date().toISOString() });
+        saveState();
+      }catch(e){
+        out.innerHTML = "";
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+      }finally{ btn.disabled = false; }
+    });
+  }
+
+  function renderResult(container, data){
+    var pct = data.maxScore ? Math.round((data.totalScore/data.maxScore)*1000)/10 : 0;
+    container.appendChild(el(
+      '<div class="score-banner"><div><div style="font-size:12.5px;color:var(--ink-soft)">Total</div>'+
+      '<div class="num">'+esc(Math.round(data.totalScore*10)/10)+' / '+esc(data.maxScore)+'</div></div>'+
+      '<div class="mono" style="font-size:15px;color:var(--mark)">'+pct+'%</div></div>'
+    ));
+    var qwrap = el('<div class="panel"></div>');
+    (data.questions||[]).forEach(function(q){
+      qwrap.appendChild(el(
+        '<div class="qrow"><div class="circle-mark">'+esc(q.awarded)+'/'+esc(q.max)+'</div>'+
+        '<div class="qbody"><div class="qno">Question '+esc(q.qNo)+'</div><div class="pointer">'+esc(q.pointer)+'</div></div></div>'
+      ));
+    });
+    container.appendChild(qwrap);
+    if((data.generalPointers||[]).length){
+      var gp = el('<div class="panel"><h3 style="font-size:15px;margin-bottom:10px;">Where to improve</h3><ul class="advice-list"></ul></div>');
+      var ul = gp.querySelector("ul"); data.generalPointers.forEach(function(t){ ul.appendChild(el("<li>"+esc(t)+"</li>")); });
+      container.appendChild(gp);
+    }
+    if((data.practicalAdvice||[]).length){
+      var pa = el('<div class="panel"><h3 style="font-size:15px;margin-bottom:10px;">Exam-day advice</h3><ul class="advice-list"></ul></div>');
+      var ul2 = pa.querySelector("ul"); data.practicalAdvice.forEach(function(t){ ul2.appendChild(el("<li>"+esc(t)+"</li>")); });
+      container.appendChild(pa);
+    }
+  }
+
+  function renderProgressChart(container){
+    var bySubject = {};
+    state.results.forEach(function(r){
+      if(!r.maxScore) return;
+      var pct = Math.max(0, Math.min(100, (r.totalScore/r.maxScore)*100));
+      (bySubject[r.subjectSlug] = bySubject[r.subjectSlug] || []).push({ t:new Date(r.createdAt).getTime(), pct:pct, date:r.createdAt });
+    });
+    var slugs = Object.keys(bySubject);
+    if(slugs.length===0){ container.appendChild(el('<div class="panel"><div class="empty">Check a few papers to see your progress here.</div></div>')); return; }
+    slugs.forEach(function(k){ bySubject[k].sort(function(a,b){ return a.t-b.t; }); });
+    var allTimes = state.results.map(function(r){ return new Date(r.createdAt).getTime(); });
+    var minT = Math.min.apply(null, allTimes), maxT = Math.max.apply(null, allTimes);
+    if(minT===maxT){ minT -= 86400000; maxT += 86400000; }
+    var W=640, H=300, padL=38, padR=16, padT=16, padB=30;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+    function x(t){ return padL + (t-minT)/(maxT-minT)*plotW; }
+    function y(pct){ return padT + (1-pct/100)*plotH; }
+    var palette = ["#ab301c","#1f4235","#c9a227","#3b6ea5","#7a3b8f","#0e7a6b","#b3541f","#5a5a5a","#c94f8f"];
+    var parts = [];
+    [0,25,50,75,100].forEach(function(g){
+      var gy = y(g);
+      parts.push('<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--border)" stroke-width="1" />');
+      parts.push('<text x="'+(padL-6)+'" y="'+(gy+4)+'" font-size="10" text-anchor="end" fill="var(--ink-soft)" font-family="IBM Plex Mono, monospace">'+g+'</text>');
+    });
+    slugs.forEach(function(s,i){
+      var color = palette[i % palette.length];
+      var pts = bySubject[s];
+      var d = pts.map(function(p,idx){ return (idx===0?"M":"L")+x(p.t).toFixed(1)+","+y(p.pct).toFixed(1); }).join(" ");
+      parts.push('<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />');
+      pts.forEach(function(p){
+        parts.push('<circle cx="'+x(p.t).toFixed(1)+'" cy="'+y(p.pct).toFixed(1)+'" r="3.5" fill="'+color+'"><title>'+esc(subjectName(s))+': '+Math.round(p.pct)+'% on '+esc(fmtDate(p.date))+'</title></circle>');
+      });
+    });
+    var svg = '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" role="img" aria-label="Score progress over time by subject">'+parts.join("")+'</svg>';
+    var legend = '<div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;">'+slugs.map(function(s,i){
+      return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;"><span style="width:10px;height:10px;border-radius:50%;background:'+palette[i%palette.length]+';display:inline-block;"></span>'+esc(subjectName(s))+'</span>';
+    }).join("")+'</div>';
+    container.appendChild(el('<div class="panel">'+svg+legend+'</div>'));
+  }
+
+  // ================= PLANNER (coming later) =================
+  function chapterStatus(slug, chapterName){
+    var s = state.subjects[slug];
+    return (s && s.chapterStatus && s.chapterStatus[chapterName]) || "pending";
+  }
+  function setChapterStatus(slug, chapterName, status){
+    var s = state.subjects[slug];
+    if(!s) return;
+    if(!s.chapterStatus) s.chapterStatus = {};
+    s.chapterStatus[chapterName] = status;
+  }
+  function subjectAvgPct(slug){
+    var rs = state.results.filter(function(r){ return r.subjectSlug===slug && r.maxScore; });
+    if(rs.length===0) return null;
+    var sum = rs.reduce(function(a,r){ return a + (r.totalScore/r.maxScore)*100; }, 0);
+    return Math.round(sum/rs.length);
+  }
+
+  function renderPlanner(main){
+    main.appendChild(el(
+      '<div class="page-head"><div class="eyebrow">Planner</div><h2>Your study plan</h2>'+
+      '<p>Set your weekly timetable once, log what got covered in school each day, and let it build a day-by-day plan weighted toward what’s pending and where your Analysis scores are weakest.</p></div>'
+    ));
+
+    renderTimetablePanel(main);
+    renderCheckinPanel(main);
+    renderChapterProgressPanel(main);
+    renderExamDatesPanel(main);
+    renderPlanGenerator(main);
+  }
+
+  function renderTimetablePanel(main){
+    var panel = el('<div class="panel"><h3 class="section-h">Weekly timetable</h3><p style="color:var(--ink-soft);font-size:13px;margin-top:-6px;margin-bottom:12px;">Tick which subjects have a class on each day — this helps the plan avoid piling revision onto a day already full of fresh classes.</p></div>');
+    DAYS.forEach(function(d){
+      var checked = state.timetable[d[0]] || [];
+      var row = el('<div style="margin-bottom:10px;"><label style="margin-bottom:4px;">'+d[1]+'</label><div class="chapters-box"></div></div>');
+      var box = row.querySelector(".chapters-box");
+      sortedSubjects().forEach(function(sub){
+        var isOn = checked.indexOf(sub.slug)!==-1;
+        var chip = el('<label class="chapter-chip'+(isOn?" checked":"")+'"><input type="checkbox" value="'+esc(sub.slug)+'"'+(isOn?" checked":"")+'><span>'+esc(sub.name)+'</span></label>');
+        chip.querySelector("input").addEventListener("change", function(){
+          var list = state.timetable[d[0]] || [];
+          var idx = list.indexOf(sub.slug);
+          if(this.checked && idx===-1) list.push(sub.slug);
+          else if(!this.checked && idx!==-1) list.splice(idx,1);
+          state.timetable[d[0]] = list;
+          chip.classList.toggle("checked", this.checked);
+          saveState();
+        });
+        box.appendChild(chip);
+      });
+      panel.appendChild(row);
+    });
+    main.appendChild(panel);
+  }
+
+  function renderCheckinPanel(main){
+    var panel = el(
+      '<div class="panel"><h3 class="section-h">Today’s check-in</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13px;margin-top:-6px;margin-bottom:12px;">What got covered in school today?</p>'+
+      '<div class="row">'+
+        '<div class="field"><label for="chk-date">Date</label><input id="chk-date" type="date"></div>'+
+        '<div class="field"><label for="chk-in-subject">Subject</label><select id="chk-in-subject">'+
+          sortedSubjects().map(function(s){ return '<option value="'+esc(s.slug)+'">'+esc(s.name)+'</option>'; }).join("")+
+        '</select></div>'+
+      '</div>'+
+      '<div class="field"><label>Chapters covered today (tick any — marks them &ldquo;Covered in class&rdquo;)</label><div class="chapters-box" id="chk-in-chapters"></div></div>'+
+      '<div class="field"><label for="chk-in-note">Note (optional)</label><textarea id="chk-in-note" placeholder="e.g. Teacher said next test covers up to Chapter 5" style="min-height:60px;"></textarea></div>'+
+      '<button class="btn small" id="chk-in-save">Save today’s log</button>'+
+      '<div id="chk-in-status"></div>'+
+      '<div id="chk-in-history"></div></div>'
+    );
+    main.appendChild(panel);
+    var dateInput = panel.querySelector("#chk-date");
+    dateInput.value = new Date().toISOString().slice(0,10);
+    var subjSel = panel.querySelector("#chk-in-subject");
+    function refreshChapterChips(){
+      var slug = subjSel.value;
+      var chapters = (state.subjects[slug] && state.subjects[slug].chapters) || [];
+      var box = panel.querySelector("#chk-in-chapters");
+      box.innerHTML = chapters.length ? chapters.map(function(c){
+        return '<label class="chapter-chip"><input type="checkbox" value="'+esc(c)+'"><span>'+esc(c)+'</span></label>';
+      }).join("") : '<span style="font-size:13px;color:var(--ink-soft);">No chapters listed for this subject yet — add some in Material.</span>';
+      box.querySelectorAll(".chapter-chip").forEach(function(chip){
+        chip.addEventListener("click", function(){
+          setTimeout(function(){ chip.classList.toggle("checked", chip.querySelector("input").checked); }, 0);
+        });
+      });
+    }
+    subjSel.addEventListener("change", refreshChapterChips);
+    refreshChapterChips();
+
+    function renderHistory(){
+      var hist = state.dailyLogs.slice(0,8);
+      var wrap = panel.querySelector("#chk-in-history");
+      wrap.innerHTML = "";
+      if(hist.length===0) return;
+      wrap.appendChild(el('<h4 style="font-size:13px;color:var(--ink-soft);margin:14px 0 6px;">Recent check-ins</h4>'));
+      hist.forEach(function(log){
+        wrap.appendChild(el(
+          '<div class="qrow"><div class="qbody"><div class="qno">'+esc(fmtDate(log.date))+' · '+esc(subjectName(log.subjectSlug))+'</div>'+
+          '<div class="pointer">'+esc((log.chapters||[]).join(", ")||"(no chapters ticked)")+(log.note?" — "+esc(log.note):"")+'</div></div></div>'
+        ));
+      });
+    }
+    renderHistory();
+
+    panel.querySelector("#chk-in-save").addEventListener("click", function(){
+      var slug = subjSel.value;
+      var chapters = Array.from(panel.querySelectorAll("#chk-in-chapters input:checked")).map(function(cb){ return cb.value; });
+      var note = panel.querySelector("#chk-in-note").value.trim();
+      var date = dateInput.value || new Date().toISOString().slice(0,10);
+      chapters.forEach(function(c){ setChapterStatus(slug, c, "covered"); });
+      state.dailyLogs.unshift({ id:uid(), date:date, subjectSlug:slug, chapters:chapters, note:note, createdAt:new Date().toISOString() });
+      saveState();
+      panel.querySelector("#chk-in-status").innerHTML = "";
+      panel.querySelector("#chk-in-status").appendChild(el('<div class="notice ok">Saved.</div>'));
+      panel.querySelector("#chk-in-note").value = "";
+      panel.querySelectorAll("#chk-in-chapters input").forEach(function(cb){ cb.checked=false; cb.closest(".chapter-chip").classList.remove("checked"); });
+      renderHistory();
+    });
+  }
+
+  function renderChapterProgressPanel(main){
+    var panel = el('<div class="panel"><h3 class="section-h">Chapter progress</h3><p style="color:var(--ink-soft);font-size:13px;margin-top:-6px;margin-bottom:6px;">Click a status to change it — useful for marking something &ldquo;Revised&rdquo; or &ldquo;Mastered&rdquo; after you’ve studied it yourself.</p></div>');
+    sortedSubjects().forEach(function(s){
+      if(!s.chapters || s.chapters.length===0) return;
+      var avg = subjectAvgPct(s.slug);
+      var block = el('<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><strong style="font-size:14px;">'+esc(s.name)+'</strong>'+
+        (avg!==null ? '<span class="mono" style="font-size:12px;color:var(--ink-soft);">avg '+avg+'%</span>' : '')+
+        '</div></div>');
+      var list = el('<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>');
+      s.chapters.forEach(function(c){
+        var current = chapterStatus(s.slug, c);
+        var row = el('<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="font-size:13.5px;">'+esc(c)+'</span></div>');
+        var sel = document.createElement("select");
+        sel.style.cssText = "width:auto;font-size:12px;padding:4px 8px;";
+        CHAPTER_STATUSES.forEach(function(st){
+          var opt = document.createElement("option"); opt.value = st[0]; opt.textContent = st[1];
+          if(st[0]===current) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        sel.addEventListener("change", function(){ setChapterStatus(s.slug, c, sel.value); saveState(); });
+        row.appendChild(sel);
+        list.appendChild(row);
+      });
+      block.appendChild(list);
+      panel.appendChild(block);
+    });
+    main.appendChild(panel);
+  }
+
+  function renderExamDatesPanel(main){
+    var panel = el('<div class="panel"><h3 class="section-h">Upcoming exam dates</h3><p style="color:var(--ink-soft);font-size:13px;margin-top:-6px;margin-bottom:12px;">Optional — helps the plan front-load subjects with a closer exam.</p></div>');
+    sortedSubjects().forEach(function(s){
+      var row = el('<div class="row" style="align-items:flex-end;"><div class="field" style="flex:1;margin-bottom:8px;"><label>'+esc(s.name)+'</label><input type="date" data-slug="'+esc(s.slug)+'" value="'+esc(state.examDates[s.slug]||"")+'"></div></div>');
+      row.querySelector("input").addEventListener("change", function(){
+        if(this.value) state.examDates[s.slug] = this.value; else delete state.examDates[s.slug];
+        saveState();
+      });
+      panel.appendChild(row);
+    });
+    main.appendChild(panel);
+  }
+
+  function renderPlanGenerator(main){
+    var panel = el(
+      '<div class="panel"><h3 class="section-h">Generate my plan</h3>'+
+      '<div class="field"><label for="plan-days">Plan for the next</label><select id="plan-days">'+
+        [["3","3 days"],["7","7 days"],["14","14 days"]].map(function(o){ return '<option value="'+o[0]+'">'+o[1]+'</option>'; }).join("")+
+      '</select></div>'+
+      '<button class="btn" id="plan-gen-btn">Generate plan</button>'+
+      '<div id="plan-status"></div><div id="plan-output"></div></div>'
+    );
+    main.appendChild(panel);
+
+    function renderPlan(){
+      var out = panel.querySelector("#plan-output");
+      out.innerHTML = "";
+      if(!state.studyPlan || !state.studyPlan.days) return;
+      out.appendChild(el('<h4 style="font-size:13px;color:var(--ink-soft);margin:16px 0 10px;">Generated '+esc(fmtDate(state.studyPlan.generatedAt))+'</h4>'));
+      state.studyPlan.days.forEach(function(day, di){
+        var dayBlock = el('<div class="panel" style="margin-bottom:10px;"><strong>'+esc(day.dayLabel||"")+' · '+esc(fmtDate(day.date))+'</strong></div>');
+        (day.items||[]).forEach(function(item, ii){
+          var row = el(
+            '<div class="qrow"><div class="circle-mark" style="width:28px;height:28px;transform:none;"><input type="checkbox" style="width:16px;height:16px;" '+(item.done?"checked":"")+'></div>'+
+            '<div class="qbody"><div class="qno">'+esc(item.subjectName||"")+' · '+esc(item.chapter||"")+' · '+esc(item.minutes||"")+' min</div>'+
+            '<div class="pointer" style="'+(item.done?"text-decoration:line-through;color:var(--ink-soft);":"")+'">'+esc(item.task||"")+'</div></div></div>'
+          );
+          row.querySelector("input").addEventListener("change", function(){
+            state.studyPlan.days[di].items[ii].done = this.checked;
+            saveState(); renderPlan();
+          });
+          dayBlock.appendChild(row);
+        });
+        out.appendChild(dayBlock);
+      });
+    }
+    renderPlan();
+
+    panel.querySelector("#plan-gen-btn").addEventListener("click", async function(){
+      var btn = this;
+      var status = panel.querySelector("#plan-status");
+      status.innerHTML = "";
+      var nDays = parseInt(panel.querySelector("#plan-days").value,10) || 7;
+      btn.disabled = true;
+      panel.querySelector("#plan-output").innerHTML = "";
+      panel.querySelector("#plan-output").appendChild(el('<div class="empty thinking">Building your plan&hellip;</div>'));
+
+      var todayIso = new Date().toISOString().slice(0,10);
+      var timetableText = DAYS.map(function(d){
+        var subs = (state.timetable[d[0]]||[]).map(subjectName);
+        return d[1]+": "+(subs.length?subs.join(", "):"no classes listed");
+      }).join("\n");
+      var progressText = sortedSubjects().map(function(s){
+        if(!s.chapters || s.chapters.length===0) return null;
+        var avg = subjectAvgPct(s.slug);
+        var chaps = s.chapters.map(function(c){ return c+" ["+chapterStatus(s.slug,c)+"]"; }).join(", ");
+        return s.name+(avg!==null?" (avg score "+avg+"%)":"")+": "+chaps;
+      }).filter(Boolean).join("\n");
+      var examText = Object.keys(state.examDates).map(function(slug){ return subjectName(slug)+": "+state.examDates[slug]; }).join("\n") || "(none set)";
+      var recentLogsText = state.dailyLogs.slice(0,10).map(function(l){ return l.date+" "+subjectName(l.subjectSlug)+": "+(l.chapters||[]).join(", ")+(l.note?" — "+l.note:""); }).join("\n") || "(none yet)";
+
+      var prompt =
+        "You are building a personalized day-by-day home-study plan for an ICSE Class 9 student, starting "+todayIso+", for the next "+nDays+" days.\n\n"+
+        "Weekly school timetable (subjects with class each day):\n"+timetableText+"\n\n"+
+        "Chapter progress per subject, with status in brackets (pending = not covered/started, covered = taught in class but not revised, revised = studied once, mastered = confident) and recent average score on checked practice papers where available:\n"+progressText+"\n\n"+
+        "Upcoming exam dates:\n"+examText+"\n\n"+
+        "Recent daily check-ins (what's freshly been taught):\n"+recentLogsText+"\n\n"+
+        "Build the plan: for each of the next "+nDays+" days, list 2-4 concrete, specific study tasks (never vague like ‘study math’ — say exactly what to do, e.g. ‘Revise Compound Interest formulas, then solve 10 practice problems’), each sized around 20-45 minutes, realistic for a school student's evening. Prioritize: chapters still pending or covered-but-not-revised, subjects with lower average scores, and chapters whose subject has a nearer exam date. Don't overload a day that already has many fresh classes in the timetable. Spread subjects out rather than repeating the same one every day unless it genuinely needs it.\n\n"+
+        "Reply with ONLY JSON, this exact shape:\n"+
+        '{"days":[{"date":"YYYY-MM-DD","dayLabel":"Monday","items":[{"subjectSlug":"mathematics","subjectName":"Mathematics","chapter":"Compound Interest","task":"specific actionable task","minutes":30}]}]}';
+
+      try{
+        var text = await callGemini([{text:prompt}], { maxOutputTokens:4000, json:true });
+        var data = extractJson(text);
+        state.studyPlan = { generatedAt: new Date().toISOString(), days: data.days || [] };
+        saveState();
+        renderPlan();
+      }catch(e){
+        panel.querySelector("#plan-output").innerHTML = "";
+        status.appendChild(el('<div class="notice err">'+esc(apiErrorCopy(e))+'</div>'));
+        renderPlan();
+      }finally{ btn.disabled = false; }
+    });
+  }
+
+  // ================= SETTINGS =================
+  function renderSettings(main){
+    main.appendChild(el('<div class="page-head"><div class="eyebrow">Settings</div><h2>API key, subjects &amp; more</h2></div>'));
+
+    var googlePanel = el(
+      '<div class="panel"><h3 class="section-h">Sign in with Google (auto-create your key)</h3>'+
+      (GOOGLE_CLIENT_ID ? (
+        '<p style="color:var(--ink-soft);font-size:13.5px;margin-top:-4px;">Sign in with your own Google account and this will create a free Gemini API key for you automatically — no copy-pasting. '+
+        'Best with a personal Gmail account; school/managed accounts often block this. You may see an &ldquo;unverified app&rdquo; warning from Google — that&rsquo;s expected for this kind of personal tool, and only Google accounts already added as test users can get past it.</p>'+
+        '<button class="btn" id="google-signin-btn"'+(googleSignInBusy?" disabled":"")+'>'+(googleSignInBusy?"Working…":"Sign in with Google")+'</button>'+
+        (googleSignInStatus ? '<p style="color:var(--ink-soft);font-size:13px;margin-top:10px;">'+esc(googleSignInStatus)+'</p>' : '')+
+        (googleSignInError ? '<p style="color:var(--mark);font-size:13px;margin-top:10px;">'+esc(googleSignInError)+'</p>' : '')
+      ) : (
+        '<p style="color:var(--ink-soft);font-size:13.5px;">Not set up yet for this copy of the app — see SETUP.md &ldquo;Sign in with Google&rdquo; section. Until then, use the manual API key option below (it takes about a minute too).</p>'
+      ))+
+      '</div>'
+    );
+    main.appendChild(googlePanel);
+    if(GOOGLE_CLIENT_ID){
+      document.getElementById("google-signin-btn").addEventListener("click", startGoogleSignIn);
+    }
+
+    var apiPanel = el(
+      '<div class="panel"><h3 class="section-h">Gemini API key (free) — manual option</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13.5px;margin-top:-4px;">Get a free key with no credit card at '+
+      '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. It’s used only to call Gemini directly from this browser.</p>'+
+      '<div class="field"><label for="set-key">API key</label><input id="set-key" type="password" placeholder="AIza..." value="'+esc(state.apiKey)+'"></div>'+
+      '<div class="field"><label for="set-model">Model</label><select id="set-model">'+
+        MODELS.map(function(m){ return '<option value="'+m[0]+'"'+(m[0]===state.model?" selected":"")+'>'+esc(m[1])+'</option>'; }).join("")+
+      '</select></div>'+
+      '<div class="field" id="set-custom-wrap" style="'+(state.model==="custom"?"":"display:none")+'"><label for="set-custom">Custom model ID</label>'+
+      '<input id="set-custom" type="text" placeholder="e.g. gemini-2.5-flash-lite" value="'+esc(state.customModel||"")+'">'+
+      '<p style="color:var(--ink-soft);font-size:12px;margin-top:4px;">Check <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> for which models currently show as free for your account.</p></div>'+
+      '<button class="btn" id="set-save">Save</button><span id="set-saved" style="margin-left:10px;font-size:13px;color:var(--ok)"></span>'+
+      '<p style="color:var(--ink-soft);font-size:12px;margin-top:14px;">Note: on Google’s free tier, content you send may be used by Google to improve their products (this does not apply to their paid tier). Fine for study material, just worth knowing.</p>'+
+      '</div>'
+    );
+    main.appendChild(apiPanel);
+    document.getElementById("set-model").addEventListener("change", function(){
+      document.getElementById("set-custom-wrap").style.display = this.value==="custom" ? "" : "none";
+    });
+    document.getElementById("set-save").addEventListener("click", function(){
+      state.apiKey = document.getElementById("set-key").value.trim();
+      state.model = document.getElementById("set-model").value;
+      state.customModel = document.getElementById("set-custom") ? document.getElementById("set-custom").value.trim() : "";
+      saveState();
+      document.getElementById("set-saved").textContent = "Saved.";
+      setTimeout(function(){ var el2 = document.getElementById("set-saved"); if(el2) el2.textContent=""; }, 1800);
+    });
+
+    var subjPanel = el(
+      '<div class="panel"><h3 class="section-h">Add a subject</h3>'+
+      '<div class="row" style="align-items:flex-end">'+
+        '<div class="field" style="margin-bottom:0"><input id="lib-newsubject" type="text" placeholder="e.g. Computer Applications"></div>'+
+        '<button class="btn small" id="lib-add-btn">Add</button>'+
+      '</div><p style="color:var(--ink-soft);font-size:12.5px;margin-top:10px;">Manage chapters, materials and mock papers for a subject from the Material tab.</p></div>'
+    );
+    main.appendChild(subjPanel);
+    document.getElementById("lib-add-btn").addEventListener("click", function(){
+      var input = document.getElementById("lib-newsubject");
+      var name = input.value.trim(); if(!name) return;
+      var slug = slugify(name);
+      state.subjects[slug] = { slug:slug, name:name, chapters:[] };
+      saveState(); input.value=""; render();
+    });
+
+    var themePanel = el(
+      '<div class="panel"><h3 class="section-h">Theme</h3>'+
+      '<p style="color:var(--ink-soft);font-size:12.5px;margin-top:-4px;margin-bottom:12px;">'+
+      '&ldquo;Chatbot Light&rdquo; is the default — a clean, minimal look like a typical AI chat app. &ldquo;Enchanted Academy&rdquo; and &ldquo;Six Gems&rdquo; are original looks (candlelit-parchment, and a starfield with a colourful six-hue accent motif) — inspired by cozy/epic aesthetics in general, not any specific book, film or comic&rsquo;s characters, names or branding. &ldquo;Custom Colour&rdquo; lets you pick your own accent colour on a fixed light layout.</p>'+
+      '<div class="row" id="theme-row">'+
+        THEMES.map(function(t){ return '<label class="diff-opt'+(state.theme===t[0]?" checked":"")+'" style="flex:1;min-width:150px;"><input type="radio" name="theme" value="'+t[0]+'"'+(state.theme===t[0]?" checked":"")+'>'+esc(t[1])+'</label>'; }).join("")+
+      '</div>'+
+      '<div id="custom-accent-wrap" style="'+(state.theme==="custom"?"margin-top:16px;":"display:none;margin-top:16px;")+'">'+
+        '<label>Pick your accent colour</label>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'+
+          CUSTOM_ACCENT_PRESETS.map(function(hex){
+            return '<button type="button" class="accent-swatch" data-hex="'+hex+'" style="width:30px;height:30px;border-radius:50%;border:2px solid '+(state.customAccent===hex?"var(--ink)":"transparent")+';background:'+hex+';cursor:pointer;padding:0;"></button>';
+          }).join("")+
+          '<input type="color" id="custom-accent-picker" value="'+esc(state.customAccent||CUSTOM_ACCENT_PRESETS[0])+'" style="width:38px;height:30px;padding:0;border:1px solid var(--border);border-radius:6px;cursor:pointer;">'+
+        '</div>'+
+      '</div>'+
+      '</div>'
+    );
+    main.appendChild(themePanel);
+    function refreshAccentSwatches(){
+      themePanel.querySelectorAll(".accent-swatch").forEach(function(sw){
+        sw.style.borderColor = (sw.getAttribute("data-hex")===state.customAccent) ? "var(--ink)" : "transparent";
+      });
+    }
+    function setCustomAccent(hex){
+      state.customAccent = hex; saveState();
+      document.getElementById("custom-accent-picker").value = hex;
+      refreshAccentSwatches();
+      if(state.theme==="custom") applyCustomAccent(hex);
+    }
+    themePanel.querySelectorAll('input[name="theme"]').forEach(function(radio){
+      radio.addEventListener("change", function(){
+        themePanel.querySelectorAll(".diff-opt").forEach(function(o){ o.classList.remove("checked"); });
+        radio.closest(".diff-opt").classList.add("checked");
+        state.theme = radio.value; saveState();
+        document.documentElement.setAttribute("data-theme", state.theme);
+        if(state.theme==="custom") applyCustomAccent(state.customAccent || CUSTOM_ACCENT_PRESETS[0]);
+        else clearCustomAccentOverride();
+        document.getElementById("custom-accent-wrap").style.display = state.theme==="custom" ? "" : "none";
+      });
+    });
+    themePanel.querySelectorAll(".accent-swatch").forEach(function(sw){
+      sw.addEventListener("click", function(){ setCustomAccent(sw.getAttribute("data-hex")); });
+    });
+    var pickerEl = document.getElementById("custom-accent-picker");
+    if(pickerEl) pickerEl.addEventListener("input", function(){ setCustomAccent(this.value); });
+
+    var syncPanel = el(
+      '<div class="panel"><h3 class="section-h">Cross-device sync</h3>'+
+      syncStatusHtml()+
+      (FIREBASE_CONFIG ? (
+        '<div class="field"><label for="set-synccode">Sync code</label><input id="set-synccode" type="text" placeholder="a phrase only you would use" value="'+esc(getSyncCode())+'"></div>'+
+        '<button class="btn small" id="set-sync-connect">Use this code on this device</button>'+
+        '<p style="color:var(--ink-soft);font-size:12.5px;margin-top:10px;">Type the exact same code on every device to keep them in sync.</p>'
+      ) : (
+        '<p style="color:var(--ink-soft);font-size:13.5px;">Not set up yet — data stays on this device only. See SETUP.md &ldquo;Cross-device sync&rdquo; for the one-time free Firebase setup.</p>'
+      ))+
+      '</div>'
+    );
+    main.appendChild(syncPanel);
+    if(FIREBASE_CONFIG){
+      document.getElementById("set-sync-connect").addEventListener("click", function(){
+        var code = document.getElementById("set-synccode").value.trim();
+        if(!code){ alert("Enter a sync code first."); return; }
+        connectSync(code); render();
+      });
+    }
+
+    var backup = el(
+      '<div class="panel"><h3 class="section-h">Backup &amp; transfer</h3>'+
+      '<p style="color:var(--ink-soft);font-size:13.5px;margin:0 0 14px;">Everything lives only in this browser unless synced. Export a backup before switching devices.</p>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;">'+
+        '<button class="btn secondary" id="set-export">Export backup (.json)</button>'+
+        '<button class="btn secondary" id="set-import-btn">Import backup</button>'+
+        '<button class="btn danger" id="set-clear">Erase all data on this device</button>'+
+      '</div><input type="file" id="set-import-file" accept="application/json" style="display:none"></div>'
+    );
+    main.appendChild(backup);
+    document.getElementById("set-export").addEventListener("click", function(){
+      var blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "studyio-backup-"+new Date().toISOString().slice(0,10)+".json";
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+    document.getElementById("set-import-btn").addEventListener("click", function(){ document.getElementById("set-import-file").click(); });
+    document.getElementById("set-import-file").addEventListener("change", async function(){
+      var file = this.files[0]; if(!file) return;
+      try{
+        var incoming = JSON.parse(await file.text());
+        if(!incoming || typeof incoming!=="object") throw new Error("bad file");
+        state = normalizeState(incoming);
+        saveState(); alert("Backup imported."); render();
+      }catch(e){ alert("That didn't look like a valid backup file."); }
+    });
+    document.getElementById("set-clear").addEventListener("click", async function(){
+      if(!confirm("This erases every subject, paper, result and your API key. This can't be undone. Continue?")) return;
+      var eraseCloudToo = syncDocRef ? confirm("You're synced to the cloud. Also erase the synced copy, so every device connected with this code clears too? (Cancel: only this device clears, and it will re-sync the old data back shortly.)") : false;
+      localStorage.removeItem(STORAGE_KEY);
+      state = loadState();
+      if(syncDocRef && eraseCloudToo){
+        try{ await syncDocRef.set({ payload: JSON.stringify(state), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); }catch(e){}
+      }
+      render();
+    });
+  }
+
+  function syncStatusHtml(){
+    var map = {
+      disabled: ['pending', 'Local only on this device'],
+      connecting: ['pending', 'Connecting&hellip;'],
+      "no-code": ['pending', 'Enter a sync code below to start'],
+      connected: ['done', 'Connected — syncing with any device using this code'],
+      error: ['failed', 'Couldn’t connect — check your Firebase config and internet connection']
+    };
+    var m = map[syncStatus] || map.disabled;
+    return '<span class="status-badge '+m[0]+'" style="margin-bottom:12px;display:inline-block;">'+m[1]+'</span>';
+  }
+
+  // ---------- boot ----------
+  state = loadState();
+  render();
+  document.getElementById("main").addEventListener("focusout", function(){
+    if(pendingRerender){ pendingRerender = false; render(); }
+  });
+  initSync();
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(e){ console.warn("Service worker failed:", e); });
+    });
+  }
+})();
+</script>
+</body>
+</html>
