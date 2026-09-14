@@ -1,0 +1,14 @@
+{
+  "name": "Studyio",
+  "short_name": "Studyio",
+  "description": "ICSE Class 9 practice papers, material analysis, and progress tracking.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f1e4",
+  "theme_color": "#1f4235",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
